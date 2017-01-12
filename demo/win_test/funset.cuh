@@ -4,6 +4,28 @@
 #include <stdio.h>
 #include "cpu_anim.h"
 
+int test1();//简单的两数相加
+int test2();//获取GPU设备相关属性
+int test3();//通过线程块索引来计算两个矢量和
+int test4();//Julia的CUDA实现
+int test5();//通过线程索引来计算两个矢量和
+int test6();//通过线程块索引和线程索引来计算两个矢量和
+int test7();//ripple的CUDA实现
+int test8();//点积运算的CUDA实现
+int test9();//Julia的CUDA实现，加入了线程同步函数__syncthreads()
+int test10();//光线跟踪(Ray Tracing)实现，没有常量内存+使用事件来计算GPU运行时间
+int test11();//光线跟踪(Ray Tracing)实现，使用常量内存+使用事件来计算GPU运行时间
+int test12();//模拟热传导，使用纹理内存，有些问题
+int test13();//模拟热传导，使用二维纹理内存，有些问题
+int test14();//ripple的CUDA+OpenGL实现
+int test15();//模拟热传导,CUDA+OpenGL实现，有些问题
+int test16();//直方图计算，利用原子操作函数atomicAdd实现
+int test17();//固定内存的使用
+int test18();//单个stream的使用
+int test19();//多个stream的使用
+int test20();//通过零拷贝内存的方式实现点积运算
+int test21();//使用多个GPU实现点积运算
+
 #define NUM  33 * 1024 * 1024//1024*1024//33 * 1024//10
 #define DIM 1024//1000
 #define PI 3.1415926535897932f

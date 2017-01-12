@@ -446,3 +446,4 @@ __global__ void dot_kernel(int size, float *a, float *b, float *c)
 	if (cacheIndex == 0)
 		c[blockIdx.x] = cache[0];
 }
+

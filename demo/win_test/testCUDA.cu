@@ -4,35 +4,11 @@
 #include "cpu_bitmap.h"
 #include "gpu_anim.h"
 
-using namespace std;
-
-int test1();//简单的两数相加
-int test2();//获取GPU设备相关属性
-int test3();//通过线程块索引来计算两个矢量和
-int test4();//Julia的CUDA实现
-int test5();//通过线程索引来计算两个矢量和
-int test6();//通过线程块索引和线程索引来计算两个矢量和
-int test7();//ripple的CUDA实现
-int test8();//点积运算的CUDA实现
-int test9();//Julia的CUDA实现，加入了线程同步函数__syncthreads()
-int test10();//光线跟踪(Ray Tracing)实现，没有常量内存+使用事件来计算GPU运行时间
-int test11();//光线跟踪(Ray Tracing)实现，使用常量内存+使用事件来计算GPU运行时间
-int test12();//模拟热传导，使用纹理内存，有些问题
-int test13();//模拟热传导，使用二维纹理内存，有些问题
-int test14();//ripple的CUDA+OpenGL实现
-int test15();//模拟热传导,CUDA+OpenGL实现，有些问题
-int test16();//直方图计算，利用原子操作函数atomicAdd实现
-int test17();//固定内存的使用
-int test18();//单个stream的使用
-int test19();//多个stream的使用
-int test20();//通过零拷贝内存的方式实现点积运算
-int test21();//使用多个GPU实现点积运算
-
 int main(int argc, char* argv[])
 {
-	test1();
+	test2();
 
-	cout<<"ok!"<<endl;
+	std::cout << "ok!" << std::endl;
 	return 0;
 }
 
@@ -275,7 +251,7 @@ int test7()
 	return 0;
 }
 
-void generate_frame(DataBlock *d, int ticks)
+static void generate_frame(DataBlock *d, int ticks)
 {
 	dim3 blocks(DIM/16, DIM/16);
 	dim3 threads(16, 16);
@@ -285,7 +261,7 @@ void generate_frame(DataBlock *d, int ticks)
 }
 
 //clean up memory allocated on the GPU
-void cleanup(DataBlock *d)
+static void cleanup(DataBlock *d)
 {
 	HANDLE_ERROR(cudaFree(d->dev_bitmap)); 
 }
@@ -607,7 +583,7 @@ int test13()
 	return 0;
 }
 
-void Heat_anim_gpu(Heat_DataBlock *d, int ticks)
+static void Heat_anim_gpu(Heat_DataBlock *d, int ticks)
 {
 	HANDLE_ERROR(cudaEventRecord(d->start, 0));
 
@@ -648,7 +624,7 @@ void Heat_anim_gpu(Heat_DataBlock *d, int ticks)
 	printf( "Average Time per frame:  %3.1f ms\n", d->totalTime/d->frames );
 }
 
-void anim_gpu(Heat_DataBlock *d, int ticks)
+static void anim_gpu(Heat_DataBlock *d, int ticks)
 {
 	HANDLE_ERROR(cudaEventRecord(d->start, 0));
 	dim3 blocks(DIM / 16, DIM / 16);
@@ -685,7 +661,7 @@ void anim_gpu(Heat_DataBlock *d, int ticks)
 	printf("Average Time per frame:  %3.1f ms\n", d->totalTime/d->frames);
 }
 
-void Heat_anim_exit(Heat_DataBlock *d)
+static void Heat_anim_exit(Heat_DataBlock *d)
 {
 	cudaUnbindTexture(texIn);
 	cudaUnbindTexture(texOut);
@@ -700,7 +676,7 @@ void Heat_anim_exit(Heat_DataBlock *d)
 }
 
 //clean up memory allocated on the GPU
-void anim_exit(Heat_DataBlock *d) 
+static void anim_exit(Heat_DataBlock *d) 
 {
 	cudaUnbindTexture(texIn2);
 	cudaUnbindTexture(texOut2);
@@ -780,7 +756,7 @@ int test15()
 	return 0;
 }
 
-void anim_gpu_opengl(uchar4* outputBitmap, DataBlock_opengl *d, int ticks)
+static void anim_gpu_opengl(uchar4* outputBitmap, DataBlock_opengl *d, int ticks)
 {
 	HANDLE_ERROR(cudaEventRecord(d->start, 0));
 	dim3 blocks(DIM / 16, DIM / 16);
@@ -813,7 +789,7 @@ void anim_gpu_opengl(uchar4* outputBitmap, DataBlock_opengl *d, int ticks)
 	printf("Average Time per frame:  %3.1f ms\n", d->totalTime/d->frames);
 }
 
-void anim_exit_opengl(DataBlock_opengl *d)
+static void anim_exit_opengl(DataBlock_opengl *d)
 {
 	HANDLE_ERROR(cudaUnbindTexture(texIn));
 	HANDLE_ERROR(cudaUnbindTexture(texOut));
@@ -886,7 +862,7 @@ int test16()
 	return 0;
 }
 
-float cuda_malloc_test(int size, bool up)
+static float cuda_malloc_test(int size, bool up)
 {
 	cudaEvent_t start, stop;
 	int *a, *dev_a;
@@ -919,7 +895,7 @@ float cuda_malloc_test(int size, bool up)
 	return elapsedTime;
 }
 
-float cuda_host_alloc_test(int size, bool up) 
+static float cuda_host_alloc_test(int size, bool up) 
 {
 	cudaEvent_t start, stop;
 	int *a, *dev_a;
@@ -1142,7 +1118,7 @@ int test19()
 	return 0;
 }
 
-float malloc_test(int size)
+static float malloc_test(int size)
 {
 	cudaEvent_t start, stop;
 	float *a, *b, c, *partial_c;
@@ -1205,7 +1181,7 @@ float malloc_test(int size)
 	return elapsedTime;
 }
 
-float cuda_host_alloc_test(int size)
+static float cuda_host_alloc_test(int size)
 {
 	cudaEvent_t start, stop;
 	float *a, *b, c, *partial_c;
@@ -1283,7 +1259,7 @@ int test20()
 	return 0;
 }
 
-void* routine(void *pvoidData)
+static void* routine(void *pvoidData)
 {
 	DataStruct *data = (DataStruct*)pvoidData;
 	HANDLE_ERROR(cudaSetDevice(data->deviceID));
