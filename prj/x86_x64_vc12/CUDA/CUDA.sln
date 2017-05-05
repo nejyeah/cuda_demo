@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testCUDA", "..\testCUDA\testCUDA.vcxproj", "{813F9CA3-7309-442F-8153-C5E70590616F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CUDA_Test", "..\CUDA_Test\CUDA_Test.vcxproj", "{428385DE-E202-460C-9F04-C761840608F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,8 @@ Global
 		{813F9CA3-7309-442F-8153-C5E70590616F}.Debug|x64.Build.0 = Debug|x64
 		{813F9CA3-7309-442F-8153-C5E70590616F}.Release|x64.ActiveCfg = Release|x64
 		{813F9CA3-7309-442F-8153-C5E70590616F}.Release|x64.Build.0 = Release|x64
+		{428385DE-E202-460C-9F04-C761840608F5}.Debug|x64.ActiveCfg = Debug|x64
+		{428385DE-E202-460C-9F04-C761840608F5}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
