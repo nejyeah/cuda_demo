@@ -4,16 +4,15 @@
 #include <device_launch_parameters.h>
 #include "common.hpp"
 
-// reference: C:\ProgramData\NVIDIA Corporation\CUDA Samples\v8.0\0_Simple
-
 // =========================== vector add =============================
+// reference: C:\ProgramData\NVIDIA Corporation\CUDA Samples\v8.0\0_Simple\vectorAdd
 /* __global__: 函数类型限定符;在设备上运行;在主机端调用,计算能力3.2及以上可以在
 设备端调用;声明的函数的返回值必须是void类型;对此类型函数的调用是异步的,即在
 设备完全完成它的运行之前就返回了;对此类型函数的调用必须指定执行配置,即用于在
 设备上执行函数时的grid和block的维度,以及相关的流(即插入<<<   >>>运算符);
 a kernel,表示此函数为内核函数(运行在GPU上的CUDA并行计算函数称为kernel(内核函
 数),内核函数必须通过__global__函数类型限定符定义);*/
-__global__ void vectorAdd(const float *A, const float *B, float *C, int numElements)
+__global__ static void vector_add(const float *A, const float *B, float *C, int numElements)
 {
 	/* blockDim: 内置变量,用于说明每个block的维度与尺寸.为dim3类型,包含
 	了block在三个维度上的尺寸信息;对于所有线程块来说,这个变量是一个常数,
@@ -32,12 +31,23 @@ __global__ void vectorAdd(const float *A, const float *B, float *C, int numEleme
 	}
 }
 
-int vectorAdd_gpu(const float *A, const float *B, float *C, int numElements)
+int vector_add_gpu(const float* A, const float* B, float* C, int numElements, float* elapsed_time)
 {
 	/* Error code to check return values for CUDA calls
 	cudaError_t: CUDA Error types, 枚举类型,CUDA错误码,成功返回
 	cudaSuccess(0),否则返回其它(>0) */
 	cudaError_t err{ cudaSuccess };
+
+	/* cudaEvent_t: CUDA event types，结构体类型, CUDA事件，用于测量GPU在某
+	个任务上花费的时间，CUDA中的事件本质上是一个GPU时间戳，由于CUDA事件是在
+	GPU上实现的，因此它们不适于对同时包含设备代码和主机代码的混合代码计时*/
+	cudaEvent_t start, stop;
+	// cudaEventCreate: 创建一个事件对象，异步启动
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+	// cudaEventRecord: 记录一个事件，异步启动,start记录起始时间
+	cudaEventRecord(start, 0);
+
 	size_t length{ numElements * sizeof(float) };
 	float *d_A{ nullptr }, *d_B{ nullptr }, *d_C{ nullptr };
 
@@ -69,8 +79,7 @@ int vectorAdd_gpu(const float *A, const float *B, float *C, int numElements)
 	// Launch the Vector Add CUDA kernel
 	const int threadsPerBlock{ 256 };
 	const int blocksPerGrid = (numElements + threadsPerBlock - 1) / threadsPerBlock;
-	fprintf(stderr, "CUDA kernel launch with %d blocks of %d threads\n",
-		blocksPerGrid, threadsPerBlock);
+	fprintf(stderr, "CUDA kernel launch with %d blocks of %d threads\n", blocksPerGrid, threadsPerBlock);
 	/* <<< >>>: 为CUDA引入的运算符,指定线程网格和线程块维度等,传递执行参
 	数给CUDA编译器和运行时系统,用于说明内核函数中的线程数量,以及线程是如何
 	组织的;尖括号中这些参数并不是传递给设备代码的参数,而是告诉运行时如何
@@ -86,7 +95,7 @@ int vectorAdd_gpu(const float *A, const float *B, float *C, int numElements)
 	用动态分配的共享存储器大小,这些动态分配的存储器可供声明为外部数组
 	(extern __shared__)的其他任何变量使用;Ns是一个可选参数,默认值为0;S为
 	cudaStream_t类型,用于设置与内核函数关联的流.S是一个可选参数,默认值0. */
-	vectorAdd <<<blocksPerGrid, threadsPerBlock >>>(d_A, d_B, d_C, numElements);
+	vector_add <<<blocksPerGrid, threadsPerBlock >>>(d_A, d_B, d_C, numElements);
 	/* cudaGetLastError: 在同一个主机线程中,返回运行时调用中产生的最后一个
 	错误并将其重置为cudaSuccess;此函数也可能返回以前异步启动的错误码;当有
 	多个错误在对cudaGetLastError的调用之间发生时,仅最后一个错误会被报告;
@@ -105,6 +114,16 @@ int vectorAdd_gpu(const float *A, const float *B, float *C, int numElements)
 	if (err != cudaSuccess) PRINT_ERROR_INFO(cudaFree);
 	err = cudaFree(d_C);
 	if (err != cudaSuccess) PRINT_ERROR_INFO(cudaFree);
+
+	// cudaEventRecord: 记录一个事件，异步启动,stop记录结束时间
+	cudaEventRecord(stop, 0);
+	// cudaEventSynchronize: 事件同步，等待一个事件完成，异步启动
+	cudaEventSynchronize(stop);
+	// cudaEventElapseTime: 计算两个事件之间经历的时间，单位为毫秒，异步启动
+	cudaEventElapsedTime(elapsed_time, start, stop);
+	// cudaEventDestroy: 销毁事件对象，异步启动
+	cudaEventDestroy(start);
+	cudaEventDestroy(stop);
 
 	return err;
 }
