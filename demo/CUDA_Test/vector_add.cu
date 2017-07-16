@@ -1,10 +1,9 @@
-#include "simple.hpp"
+#include "funset.hpp"
 #include <iostream>
 #include <cuda_runtime.h> // For the CUDA runtime routines (prefixed with "cuda_")
 #include <device_launch_parameters.h>
 #include "common.hpp"
 
-// =========================== vector add =============================
 // reference: C:\ProgramData\NVIDIA Corporation\CUDA Samples\v8.0\0_Simple\vectorAdd
 /* __global__: 函数类型限定符;在设备上运行;在主机端调用,计算能力3.2及以上可以在
 设备端调用;声明的函数的返回值必须是void类型;对此类型函数的调用是异步的,即在
@@ -95,7 +94,7 @@ int vector_add_gpu(const float* A, const float* B, float* C, int numElements, fl
 	用动态分配的共享存储器大小,这些动态分配的存储器可供声明为外部数组
 	(extern __shared__)的其他任何变量使用;Ns是一个可选参数,默认值为0;S为
 	cudaStream_t类型,用于设置与内核函数关联的流.S是一个可选参数,默认值0. */
-	vector_add <<<blocksPerGrid, threadsPerBlock >>>(d_A, d_B, d_C, numElements);
+	vector_add << <blocksPerGrid, threadsPerBlock >> >(d_A, d_B, d_C, numElements);
 	/* cudaGetLastError: 在同一个主机线程中,返回运行时调用中产生的最后一个
 	错误并将其重置为cudaSuccess;此函数也可能返回以前异步启动的错误码;当有
 	多个错误在对cudaGetLastError的调用之间发生时,仅最后一个错误会被报告;

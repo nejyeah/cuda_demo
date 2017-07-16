@@ -20,7 +20,7 @@ static inline int check(T result, const char * const func, const char * const fi
 	}
 }
 
-#define checkCudaErrors(val) check((val), __FUNCTION__, __FILE__, __LINE__)
+#define checkCudaErrors(val) check_Cuda((val), __FUNCTION__, __FILE__, __LINE__)
 #define checkErrors(val) check((val), __FUNCTION__, __FILE__, __LINE__)
 
 #define PRINT_ERROR_INFO(info) { \

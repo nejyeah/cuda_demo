@@ -21,16 +21,14 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\demo\CUDA_Test\common.hpp" />
     <ClInclude Include="..\..\..\demo\CUDA_Test\funset.hpp" />
-    <ClInclude Include="..\..\..\demo\CUDA_Test\simple.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\demo\CUDA_Test\CUDA_Test.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\funset.cpp" />
-    <ClCompile Include="..\..\..\demo\CUDA_Test\simple.cpp" />
+    <ClCompile Include="..\..\..\demo\CUDA_Test\vector_add.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="..\..\..\demo\CUDA_Test\funset.cu" />
-    <CudaCompile Include="..\..\..\demo\CUDA_Test\simple.cu" />
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\vector_add.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{428385DE-E202-460C-9F04-C761840608F5}</ProjectGuid>

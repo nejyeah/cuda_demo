@@ -21,9 +21,6 @@
     <ClInclude Include="..\..\..\demo\CUDA_Test\common.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\demo\CUDA_Test\simple.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\demo\CUDA_Test\CUDA_Test.cpp">
@@ -32,15 +29,12 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\funset.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\demo\CUDA_Test\simple.cpp">
+    <ClCompile Include="..\..\..\demo\CUDA_Test\vector_add.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="..\..\..\demo\CUDA_Test\funset.cu">
-      <Filter>源文件</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\..\..\demo\CUDA_Test\simple.cu">
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\vector_add.cu">
       <Filter>源文件</Filter>
     </CudaCompile>
   </ItemGroup>

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "simple.hpp"
+#include "funset.hpp"
 
 int main()
 {
