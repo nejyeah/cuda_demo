@@ -32,9 +32,21 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\vector_add.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\demo\CUDA_Test\matrix_mul.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\demo\CUDA_Test\long_vector_add.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\vector_add.cu">
+      <Filter>源文件</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\matrix_mul.cu">
+      <Filter>源文件</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\long_vector_add.cu">
       <Filter>源文件</Filter>
     </CudaCompile>
   </ItemGroup>

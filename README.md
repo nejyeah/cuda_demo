@@ -1,5 +1,7 @@
 # CUDA_Test
-**The main role of the project: CUDA 8.0's usage**
+**The main role of the project: CUDA 8.0's usage:**
+- vector add: C = A + B
+- matrix multiplication: C = A * B
 
 **The project support platform: windows10 64 bits. It can be directly build with VS2013 in windows10 64bits.**
 
