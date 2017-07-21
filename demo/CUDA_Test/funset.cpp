@@ -5,6 +5,33 @@
 #include <memory>
 #include "common.hpp"
 
+int test_dot_product()
+{
+	const int length{ 10000000 };
+	std::unique_ptr<float[]> A(new float[length]);
+	std::unique_ptr<float[]> B(new float[length]);
+
+	generator_random_number(A.get(), length, -10.f, 10.f);
+	generator_random_number(B.get(), length, -10.f, 10.f);
+
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+	float value1{ 0.f }, value2{ 0.f };
+
+	int ret = dot_product_cpu(A.get(), B.get(), &value1, length, &elapsed_time1);
+	if (ret != 0) PRINT_ERROR_INFO(long_vector_add_cpu);
+
+	ret = dot_product_gpu(A.get(), B.get(), &value2, length, &elapsed_time2);
+	if (ret != 0) PRINT_ERROR_INFO(matrix_mul_gpu);
+
+	if (fabs(value1 - value2) > EPS) {
+		fprintf(stderr, "Result verification failed value1: %f, value2: %f\n", value1, value2);
+	}
+
+	fprintf(stderr, "cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	return 0;
+}
+
 int test_long_vector_add()
 {
 	const int length{ 100000000 };

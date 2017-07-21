@@ -3,7 +3,7 @@
 
 int main()
 {
-	int ret = test_long_vector_add();
+	int ret = test_dot_product();
 
 	if (ret == 0) fprintf(stderr, "***** test success *****\n");
 	else fprintf(stderr, "===== test fail =====\n");

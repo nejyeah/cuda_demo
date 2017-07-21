@@ -24,12 +24,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\demo\CUDA_Test\CUDA_Test.cpp" />
+    <ClCompile Include="..\..\..\demo\CUDA_Test\dot_product.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\funset.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\long_vector_add.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\matrix_mul.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\vector_add.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\dot_product.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\long_vector_add.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\matrix_mul.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\vector_add.cu" />

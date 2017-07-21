@@ -5,6 +5,10 @@ int test_matrix_mul();
 int matrix_mul_cpu(const float* A, const float* B, float* C, int colsA, int rowsA, int colsB, int rowsB, float* elapsed_time);
 int matrix_mul_gpu(const float* A, const float* B, float* C, int colsA, int rowsA, int colsB, int rowsB, float* elapsed_time);
 
+int test_dot_product();
+int dot_product_cpu(const float* A, const float* B, float* value, int elements_num, float* elapsed_time);
+int dot_product_gpu(const float* A, const float* B, float* value, int elements_num, float* elapsed_time);
+
 int test_long_vector_add();
 int long_vector_add_cpu(const float* A, const float* B, float* C, int elements_num, float* elapsed_time);
 int long_vector_add_gpu(const float* A, const float* B, float* C, int elements_num, float* elapsed_time);
