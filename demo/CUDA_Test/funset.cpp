@@ -3,7 +3,46 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <string>
 #include "common.hpp"
+#include <opencv2/opencv.hpp>
+
+int test_julia()
+{
+	const int width{ 512 }, height = width;
+	const float scale{ 1.5f };
+	cv::Mat mat1(height, width, CV_8UC4), mat2(height, width, CV_8UC4);
+
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+
+	int ret = julia_cpu(mat1.data, width, height, scale, &elapsed_time1);
+	if (ret != 0) PRINT_ERROR_INFO(julia_cpu);
+
+	ret = julia_gpu(mat2.data, width, height, scale, &elapsed_time2);
+	if (ret != 0) PRINT_ERROR_INFO(julia_gpu);
+
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			cv::Vec4b val1 = mat1.at<cv::Vec4b>(y, x);
+			cv::Vec4b val2 = mat2.at<cv::Vec4b>(y, x);
+
+			for (int i = 0; i < 4; ++i) {
+				if (val1[i] != val2[i]) {
+					fprintf(stderr, "their values are different at (%d, %d), i: %d, val1: %d, val2: %d\n",
+						x, y, i, val1[i], val2[i]);
+					//return -1;
+				}
+			}
+		}
+	}
+
+	const std::string save_image_name{ "E:/GitCode/CUDA_Test/julia.jpg" };
+	cv::imwrite(save_image_name, mat2);
+
+	fprintf(stderr, "cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	return 0;
+}
 
 int test_dot_product()
 {
@@ -23,7 +62,7 @@ int test_dot_product()
 	ret = dot_product_gpu(A.get(), B.get(), &value2, length, &elapsed_time2);
 	if (ret != 0) PRINT_ERROR_INFO(matrix_mul_gpu);
 
-	if (fabs(value1 - value2) > EPS) {
+	if (fabs(value1 - value2) > EPS_) {
 		fprintf(stderr, "Result verification failed value1: %f, value2: %f\n", value1, value2);
 	}
 
@@ -53,7 +92,7 @@ int test_long_vector_add()
 	int count_error{ 0 };
 	for (int i = 0; i < length; ++i) {
 		if (count_error > 100) return -1;
-		if (fabs(C1[i] - C2[i]) > EPS) {
+		if (fabs(C1[i] - C2[i]) > EPS_) {
 			fprintf(stderr, "Result verification failed at element %d, C1: %f, C2: %f\n",
 				i, C1[i], C2[i]);
 			++count_error;
@@ -88,7 +127,7 @@ int test_matrix_mul()
 	int count{ 0 };
 	for (int i = 0; i < rowsA*colsB; ++i) {
 		if (count > 100) return -1;
-		if (fabs(C1[i] - C2[i]) > EPS) {
+		if (fabs(C1[i] - C2[i]) > EPS_) {
 			fprintf(stderr, "Result verification failed at element %d, C1: %f, C2: %f\n",
 				i, C1[i], C2[i]);
 			++count;
@@ -120,7 +159,7 @@ int test_vector_add()
 	if (ret != 0) PRINT_ERROR_INFO(vectorAdd_gpu);
 
 	for (int i = 0; i < numElements; ++i) {
-		if (fabs(C1[i] - C2[i]) > EPS) {
+		if (fabs(C1[i] - C2[i]) > EPS_) {
 			fprintf(stderr, "Result verification failed at element %d!\n", i);
 			return -1;
 		}

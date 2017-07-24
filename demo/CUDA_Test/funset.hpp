@@ -1,6 +1,10 @@
 #ifndef FBC_CUDA_TEST_FUNSET_HPP_
 #define FBC_CUDA_TEST_FUNSET_HPP_
 
+int test_julia();
+int julia_cpu(unsigned char* ptr, int width, int height, float scale, float* elapsed_time);
+int julia_gpu(unsigned char* ptr, int width, int height, float scale, float* elapsed_time);
+
 int test_matrix_mul();
 int matrix_mul_cpu(const float* A, const float* B, float* C, int colsA, int rowsA, int colsB, int rowsB, float* elapsed_time);
 int matrix_mul_gpu(const float* A, const float* B, float* C, int colsA, int rowsA, int colsB, int rowsB, float* elapsed_time);
