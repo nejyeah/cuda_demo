@@ -4,6 +4,7 @@
 - matrix multiplication: C = A * B
 - dot product
 - Julia
+- ripple
 
 **The project support platform: windows10 64 bits. It can be directly build with VS2013 in windows10 64bits.**
 

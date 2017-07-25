@@ -7,6 +7,44 @@
 #include "common.hpp"
 #include <opencv2/opencv.hpp>
 
+int test_ripple()
+{
+	const int width{ 512 }, height = width;
+	const float scale{ 1.5f };
+	const int ticks{ 999 };
+	cv::Mat mat1(height, width, CV_8UC4), mat2(height, width, CV_8UC4);
+
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+
+	int ret = ripple_cpu(mat1.data, width, height, ticks, &elapsed_time1);
+	if (ret != 0) PRINT_ERROR_INFO(ripple_cpu);
+
+	ret = ripple_gpu(mat2.data, width, height, ticks, &elapsed_time2);
+	if (ret != 0) PRINT_ERROR_INFO(ripple_gpu);
+
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			cv::Vec4b val1 = mat1.at<cv::Vec4b>(y, x);
+			cv::Vec4b val2 = mat2.at<cv::Vec4b>(y, x);
+
+			for (int i = 0; i < 4; ++i) {
+				if (val1[i] != val2[i]) {
+					fprintf(stderr, "their values are different at (%d, %d), i: %d, val1: %d, val2: %d\n",
+						x, y, i, val1[i], val2[i]);
+					return -1;
+				}
+			}
+		}
+	}
+
+	const std::string save_image_name{ "E:/GitCode/CUDA_Test/ripple.jpg" };
+	cv::imwrite(save_image_name, mat2);
+
+	fprintf(stderr, "cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	return 0;
+}
+
 int test_julia()
 {
 	const int width{ 512 }, height = width;

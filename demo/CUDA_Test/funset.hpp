@@ -1,6 +1,10 @@
 #ifndef FBC_CUDA_TEST_FUNSET_HPP_
 #define FBC_CUDA_TEST_FUNSET_HPP_
 
+int test_ripple();
+int ripple_cpu(unsigned char* ptr, int width, int height, int ticks, float* elapsed_time);
+int ripple_gpu(unsigned char* ptr, int width, int height, int ticks, float* elapsed_time);
+
 int test_julia();
 int julia_cpu(unsigned char* ptr, int width, int height, float scale, float* elapsed_time);
 int julia_gpu(unsigned char* ptr, int width, int height, float scale, float* elapsed_time);
