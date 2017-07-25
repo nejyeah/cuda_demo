@@ -1,5 +1,5 @@
 # CUDA_Test
-**The main role of the project: CUDA 8.0's usage:**
+**The main role of the project: CUDA 8.0's usage(each test code gives the implementation of C ++ and CUDA, respectively, and gives the calculation time for each method):**
 - vector add: C = A + B
 - matrix multiplication: C = A * B
 - dot product
