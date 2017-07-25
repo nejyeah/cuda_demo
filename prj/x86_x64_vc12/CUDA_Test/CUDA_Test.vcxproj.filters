@@ -47,6 +47,9 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\ripple.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\demo\CUDA_Test\green_ball.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\vector_add.cu">
@@ -65,6 +68,9 @@
       <Filter>源文件</Filter>
     </CudaCompile>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\ripple.cu">
+      <Filter>源文件</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\green_ball.cu">
       <Filter>源文件</Filter>
     </CudaCompile>
   </ItemGroup>

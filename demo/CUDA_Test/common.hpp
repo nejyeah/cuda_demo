@@ -35,6 +35,7 @@ static inline int check(T result, const char * const func, const char * const fi
 	return -1; }
 
 #define EPS_ 1.0e-4 // ε(Epsilon),非常小的数
+#define PI 3.1415926535897932f
 
 static inline void generator_random_number(float* data, int length, float a = 0.f, float b = 1.f)
 {

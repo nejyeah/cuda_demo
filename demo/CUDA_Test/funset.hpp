@@ -1,6 +1,10 @@
 #ifndef FBC_CUDA_TEST_FUNSET_HPP_
 #define FBC_CUDA_TEST_FUNSET_HPP_
 
+int test_green_ball();
+int green_ball_cpu(unsigned char* ptr, int width, int height, float* elapsed_time);
+int green_ball_gpu(unsigned char* ptr, int width, int height, float* elapsed_time);
+
 int test_ripple();
 int ripple_cpu(unsigned char* ptr, int width, int height, int ticks, float* elapsed_time);
 int ripple_gpu(unsigned char* ptr, int width, int height, int ticks, float* elapsed_time);
