@@ -1,6 +1,10 @@
 #ifndef FBC_CUDA_TEST_FUNSET_HPP_
 #define FBC_CUDA_TEST_FUNSET_HPP_
 
+int test_ray_tracking();
+int ray_tracking_cpu(const float* a, const float* b, const float* c, int sphere_num, unsigned char* ptr, int width, int height, float* elapsed_time);
+int ray_tracking_gpu(const float* a, const float* b, const float* c, int sphere_num, unsigned char* ptr, int width, int height, float* elapsed_time);
+
 int test_green_ball();
 int green_ball_cpu(unsigned char* ptr, int width, int height, float* elapsed_time);
 int green_ball_gpu(unsigned char* ptr, int width, int height, float* elapsed_time);

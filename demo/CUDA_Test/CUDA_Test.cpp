@@ -3,7 +3,7 @@
 
 int main()
 {
-	int ret = test_green_ball();
+	int ret = test_ray_tracking();
 
 	if (ret == 0) fprintf(stderr, "***** test success *****\n");
 	else fprintf(stderr, "===== test fail =====\n");

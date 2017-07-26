@@ -7,6 +7,51 @@
 #include "common.hpp"
 #include <opencv2/opencv.hpp>
 
+int test_ray_tracking()
+{
+	const int spheres{ 20 };
+	std::unique_ptr<float[]> A(new float[spheres * 3]);
+	std::unique_ptr<float[]> B(new float[spheres * 3]);
+	std::unique_ptr<float[]> C(new float[spheres]);
+
+	generator_random_number(A.get(), spheres * 3, 0.f, 1.f);
+	generator_random_number(B.get(), spheres * 3, -400.f, 400.f);
+	generator_random_number(C.get(), spheres, 20.f, 120.f);
+
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+
+	const int width{ 512 }, height = width;
+	cv::Mat mat1(height, width, CV_8UC4), mat2(height, width, CV_8UC4);
+
+	int ret = ray_tracking_cpu(A.get(), B.get(), C.get(), spheres, mat1.data, width, height, &elapsed_time1);
+	if (ret != 0) PRINT_ERROR_INFO(ray_tracking_cpu);
+
+	ret = ray_tracking_gpu(A.get(), B.get(), C.get(), spheres, mat2.data, width, height, &elapsed_time2);
+	if (ret != 0) PRINT_ERROR_INFO(ray_tracking_gpu);
+
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			cv::Vec4b val1 = mat1.at<cv::Vec4b>(y, x);
+			cv::Vec4b val2 = mat2.at<cv::Vec4b>(y, x);
+
+			for (int i = 0; i < 4; ++i) {
+				if (val1[i] != val2[i]) {
+					fprintf(stderr, "their values are different at (%d, %d), i: %d, val1: %d, val2: %d\n",
+						x, y, i, val1[i], val2[i]);
+					//return -1;
+				}
+			}
+		}
+	}
+
+	const std::string save_image_name{ "E:/GitCode/CUDA_Test/ray_tracking_2.jpg" };
+	cv::imwrite(save_image_name, mat2);
+
+	fprintf(stderr, "ray tracking: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	return 0;
+}
+
 int test_green_ball()
 {
 	const int width{ 512 }, height = width;
