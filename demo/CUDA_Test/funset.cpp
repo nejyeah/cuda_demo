@@ -44,7 +44,7 @@ int test_ray_tracking()
 		}
 	}
 
-	const std::string save_image_name{ "E:/GitCode/CUDA_Test/ray_tracking_2.jpg" };
+	const std::string save_image_name{ "E:/GitCode/CUDA_Test/ray_tracking.jpg" };
 	cv::imwrite(save_image_name, mat2);
 
 	fprintf(stderr, "ray tracking: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);

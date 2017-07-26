@@ -2,13 +2,11 @@
 #include <iostream>
 #include <algorithm>
 #include <memory>
+#include <vector>
 #include <cuda_runtime.h> // For the CUDA runtime routines (prefixed with "cuda_")
 #include <device_launch_parameters.h>
 #include "common.hpp"
 
-/* 常量内存：用于保存在核函数执行期间不会发生变化的数据。NVIDIA硬件提供了64KB的常量内存，并且对常量内存
-采取了不同于标准全局内存的处理方式。在某些情况中，用常量内存来替换全局内存能有效地减少内存带宽。
-*/
 // 通过一个数据结构对球面建模
 struct Sphere {
 	float r, b, g;
@@ -30,6 +28,21 @@ struct Sphere {
 		return -INF;
 	}
 };
+
+// method2: 使用常量内存
+/* __constant__: 变量类型限定符，或者与__device__限定符连用，这样声明的变量：存
+在于常数存储器空间；与应用程序具有相同的生命周期；可以通过运行时库从主机端访问，
+设备端的所有线程也可访问。__constant__变量默认为是静态存储。__constant__不能用
+extern关键字声明为外部变量。__constant__变量只能在文件作用域中声明，不能再函数
+体内声明。__constant__变量不能从device中赋值，只能从host中通过host运行时函数赋
+值。__constant__将把变量的访问限制为只读。与从全局内存中读取数据相比，从常量内
+存中读取相同的数据可以节约内存带宽。常量内存用于保存在核函数执行期间不会发生变
+化的数据。
+常量内存：用于保存在核函数执行期间不会发生变化的数据。NVIDIA硬件提供了64KB的常
+量内存，并且对常量内存采取了不同于标准全局内存的处理方式。在某些情况中，用常量
+内存来替换全局内存能有效地减少内存带宽。 在某些情况下，使用常量内存将提升应用程
+序的性能 */
+__constant__ Sphere dev_spheres[20]; // 常量内存, = sphere_num
 
 /* __global__: 函数类型限定符;在设备上运行;在主机端调用,计算能力3.2及以上可以在
 设备端调用;声明的函数的返回值必须是void类型;对此类型函数的调用是异步的,即在
@@ -81,6 +94,35 @@ __global__ static void ray_tracking(unsigned char* ptr_image, Sphere* ptr_sphere
 	ptr_image[offset * 4 + 3] = 255;
 }
 
+__global__ static void ray_tracking(unsigned char* ptr_image, int width, int height, int sphere_num)
+{
+	int x = threadIdx.x + blockIdx.x * blockDim.x;
+	int y = threadIdx.y + blockIdx.y * blockDim.y;
+	int offset = x + y * blockDim.x * gridDim.x;
+	float ox{ (x - width / 2.f) };
+	float oy{ (y - height / 2.f) };
+
+	float r{ 0 }, g{ 0 }, b{ 0 };
+	float maxz{ -INF };
+
+	for (int i = 0; i < sphere_num; ++i) {
+		float n;
+		float t = dev_spheres[i].hit(ox, oy, &n);
+		if (t > maxz) {
+			float fscale = n;
+			r = dev_spheres[i].r * fscale;
+			g = dev_spheres[i].g * fscale;
+			b = dev_spheres[i].b * fscale;
+			maxz = t;
+		}
+	}
+
+	ptr_image[offset * 4 + 0] = static_cast<unsigned char>(r * 255);
+	ptr_image[offset * 4 + 1] = static_cast<unsigned char>(g * 255);
+	ptr_image[offset * 4 + 2] = static_cast<unsigned char>(b * 255);
+	ptr_image[offset * 4 + 3] = 255;
+}
+
 int ray_tracking_gpu(const float* a, const float* b, const float* c, int sphere_num, unsigned char* ptr, int width, int height, float* elapsed_time)
 {
 	/* cudaEvent_t: CUDA event types,结构体类型, CUDA事件,用于测量GPU在某
@@ -95,7 +137,6 @@ int ray_tracking_gpu(const float* a, const float* b, const float* c, int sphere_
 
 	const size_t length{ width * height * 4 * sizeof(unsigned char) };
 	unsigned char* dev_image{ nullptr };
-	Sphere* dev_spheres{ nullptr };
 
 	std::unique_ptr<Sphere[]> spheres(new Sphere[sphere_num]);
 	for (int i = 0, t = 0; i < sphere_num; ++i, t += 3) {
@@ -110,8 +151,10 @@ int ray_tracking_gpu(const float* a, const float* b, const float* c, int sphere_
 
 	// cudaMalloc: 在设备端分配内存
 	cudaMalloc(&dev_image, length);
-	cudaMalloc(&dev_spheres, sizeof(Sphere) * sphere_num);
 
+	// method1: 没有使用常量内存
+	//Sphere* dev_spheres{ nullptr };
+	//cudaMalloc(&dev_spheres, sizeof(Sphere) * sphere_num);
 	/* cudaMemcpy: 在主机端和设备端拷贝数据,此函数第四个参数仅能是下面之一:
 	(1). cudaMemcpyHostToHost: 拷贝数据从主机端到主机端
 	(2). cudaMemcpyHostToDevice: 拷贝数据从主机端到设备端
@@ -120,7 +163,14 @@ int ray_tracking_gpu(const float* a, const float* b, const float* c, int sphere_
 	(5). cudaMemcpyDefault: 从指针值自动推断拷贝数据方向,需要支持
 	统一虚拟寻址(CUDA6.0及以上版本)
 	cudaMemcpy函数对于主机是同步的 */
-	cudaMemcpy(dev_spheres, spheres.get(), sizeof(Sphere) * sphere_num, cudaMemcpyHostToDevice);
+	//cudaMemcpy(dev_spheres, spheres.get(), sizeof(Sphere) * sphere_num, cudaMemcpyHostToDevice);
+
+	// method2: 使用常量内存
+	/* cudaMemcpyToSymbol: 
+	cudaMemcpyToSymbol和cudaMemcpy参数为cudaMemcpyHostToDevice时的唯一差异在于cudaMemcpyToSymbol会复制到
+	常量内存，而cudaMemcpy会复制到全局内存
+	*/
+	cudaMemcpyToSymbol(dev_spheres, spheres.get(), sizeof(Sphere)* sphere_num);
 
 	const int threads_block{ 16 };
 	dim3 blocks(width / threads_block, height / threads_block);
@@ -140,13 +190,14 @@ int ray_tracking_gpu(const float* a, const float* b, const float* c, int sphere_
 	用动态分配的共享存储器大小,这些动态分配的存储器可供声明为外部数组
 	(extern __shared__)的其他任何变量使用;Ns是一个可选参数,默认值为0;S为
 	cudaStream_t类型,用于设置与内核函数关联的流.S是一个可选参数,默认值0. */
-	ray_tracking << <blocks, threads >> >(dev_image, dev_spheres, width, height, sphere_num);
+	//ray_tracking << <blocks, threads >> >(dev_image, dev_spheres, width, height, sphere_num); // method1, 不使用常量内存
+	ray_tracking << <blocks, threads >> >(dev_image, width, height, sphere_num); // method2, 使用常量内存
 
 	cudaMemcpy(ptr, dev_image, length, cudaMemcpyDeviceToHost);
 
 	// cudaFree: 释放设备上由cudaMalloc函数分配的内存
 	cudaFree(dev_image);
-	cudaFree(dev_spheres);
+	//cudaFree(dev_spheres); // 使用method1时需要释放, 如果使用常量内存即method2则不需要释放
 
 	// cudaEventRecord: 记录一个事件,异步启动,stop记录结束时间
 	cudaEventRecord(stop, 0);
