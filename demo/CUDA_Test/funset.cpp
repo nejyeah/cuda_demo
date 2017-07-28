@@ -7,6 +7,65 @@
 #include "common.hpp"
 #include <opencv2/opencv.hpp>
 
+int test_heat_conduction()
+{
+	const int width{ 1024 }, height = width;
+	cv::Mat mat1(height, width, CV_8UC4), mat2(height, width, CV_8UC4);
+
+	const float speed{ 0.25f }, max_temp{ 1.f }, min_temp{0.0001f};
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+
+	// intialize the constant data
+	std::unique_ptr<float[]> temp(new float[width * height]);
+	for (int i = 0; i < width*height; ++i) {
+		temp[i] = 0;
+		int x = i % width;
+		int y = i / height;
+		if ((x>300) && (x<600) && (y>310) && (y<601))
+			temp[i] = max_temp;
+	}
+
+	temp[width * 100 + 100] = (max_temp + min_temp) / 2;
+	temp[width * 700 + 100] = min_temp;
+	temp[width * 300 + 300] = min_temp;
+	temp[width * 200 + 700] = min_temp;
+
+	for (int y = 800; y < 900; ++y) {
+		for (int x = 400; x < 500; ++x) {
+			temp[x + y * width] = min_temp;
+		}
+	}
+
+	int ret = heat_conduction_cpu(mat1.data, width, height, temp.get(), speed, &elapsed_time1);
+	if (ret != 0) PRINT_ERROR_INFO(heat_conduction_cpu);
+
+	ret = heat_conduction_gpu(mat2.data, width, height, temp.get(), speed, &elapsed_time2);
+	if (ret != 0) PRINT_ERROR_INFO(heat_conduction_gpu);
+
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			cv::Vec4b val1 = mat1.at<cv::Vec4b>(y, x);
+			cv::Vec4b val2 = mat2.at<cv::Vec4b>(y, x);
+
+			for (int i = 0; i < 4; ++i) {
+				if (val1[i] != val2[i]) {
+					fprintf(stderr, "their values are different at (%d, %d), i: %d, val1: %d, val2: %d\n",
+						x, y, i, val1[i], val2[i]);
+					//return -1;
+				}
+			}
+		}
+	}
+
+	std::string save_image_name{ "E:/GitCode/CUDA_Test/heat_conduction.jpg" };
+	cv::resize(mat2, mat2, cv::Size(width / 2, height / 2), 0.f, 0.f, 2);
+	cv::imwrite(save_image_name, mat2);
+
+	fprintf(stderr, "test heat conduction: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	return 0;
+}
+
 int test_ray_tracking()
 {
 	const int spheres{ 20 };

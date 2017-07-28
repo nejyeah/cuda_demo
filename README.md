@@ -7,6 +7,7 @@
 - ripple
 - green ball
 - ray tracking
+- heat conduction
 
 **The project support platform: windows10 64 bits. It can be directly build with VS2013 in windows10 64bits.**
 

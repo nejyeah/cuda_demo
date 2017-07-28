@@ -27,6 +27,7 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\dot_product.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\funset.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\green_ball.cpp" />
+    <ClCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\julia.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\long_vector_add.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\matrix_mul.cpp" />
@@ -37,6 +38,7 @@
   <ItemGroup>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\dot_product.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\green_ball.cu" />
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\julia.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\long_vector_add.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\matrix_mul.cu" />
