@@ -56,6 +56,9 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\demo\CUDA_Test\calculate_histogram.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\vector_add.cu">
@@ -83,6 +86,9 @@
       <Filter>源文件</Filter>
     </CudaCompile>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cu">
+      <Filter>源文件</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\calculate_histogram.cu">
       <Filter>源文件</Filter>
     </CudaCompile>
   </ItemGroup>

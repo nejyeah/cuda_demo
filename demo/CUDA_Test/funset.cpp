@@ -4,8 +4,46 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <algorithm>
 #include "common.hpp"
 #include <opencv2/opencv.hpp>
+
+int test_calculate_histogram()
+{
+	const int length{ 10 * 1024 * 1024 }; // 100MB
+	std::unique_ptr<unsigned char[]> data(new unsigned char[length]);
+	generator_random_number<unsigned char>(data.get(), length, 0, 255);
+
+	const int hist_size{ 256 };
+	std::unique_ptr<size_t[]> hist1(new size_t[hist_size]), hist2(new size_t[hist_size]);
+	std::for_each(hist1.get(), hist1.get() + hist_size, [](size_t& n) {n = 0; });
+	std::for_each(hist2.get(), hist2.get() + hist_size, [](size_t& n) {n = 0; });
+
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+	size_t value1{ 0 }, value2{ 0 };
+
+	int ret = calculate_histogram_cpu(data.get(), length, hist1.get(), value1, &elapsed_time1);
+	if (ret != 0) PRINT_ERROR_INFO(calculate_histogram_cpu);
+
+	ret = calculate_histogram_gpu(data.get(), length, hist2.get(), value2, &elapsed_time2);
+	if (ret != 0) PRINT_ERROR_INFO(calculate_histogram_gpu);
+
+	if (value1 != value2) {
+		fprintf(stderr, "their values are different: val1: %d, val2: %d\n", value1, value2);
+		return -1;
+	}
+	for (int i = 0; i < hist_size; ++i) {
+		if (hist1[i] != hist2[i]) {
+			fprintf(stderr, "their values are different at: %d, val1: %d, val2: %d\n",
+				i, hist1[i], hist2[i]);
+			return -1;
+		}
+	}
+
+	fprintf(stderr, "test calculate histogram: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	return 0;
+}
 
 int test_heat_conduction()
 {

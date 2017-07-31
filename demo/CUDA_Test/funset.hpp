@@ -1,6 +1,10 @@
 #ifndef FBC_CUDA_TEST_FUNSET_HPP_
 #define FBC_CUDA_TEST_FUNSET_HPP_
 
+int test_calculate_histogram();
+int calculate_histogram_cpu(const unsigned char* data, int length, size_t* hist, size_t& value, float* elapsed_time);
+int calculate_histogram_gpu(const unsigned char* data, int length, size_t* hist, size_t& value, float* elapsed_time);
+
 int test_heat_conduction();
 int heat_conduction_cpu(unsigned char* ptr, int width, int height, const float* src, float speed, float* elapsed_time);
 int heat_conduction_gpu(unsigned char* ptr, int width, int height, const float* src, float speed, float* elapsed_time);

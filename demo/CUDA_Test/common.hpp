@@ -48,4 +48,15 @@ static inline void generator_random_number(float* data, int length, float a = 0.
 	}
 }
 
+template<typename T> // unsigned char, char, int , short
+static inline void generator_random_number(T* data, int length, T a = (T)0, T b = (T)1)
+{
+	std::random_device rd; std::mt19937 generator(rd()); // 每次产生不固定的不同的值
+	//std::default_random_engine generator; // 每次产生固定的不同的值
+	std::uniform_int_distribution<int> distribution(a, b);
+	for (int i = 0; i < length; ++i) {
+		data[i] = static_cast<T>(distribution(generator));
+	}
+}
+
 #endif // FBC_CUDA_TEST_COMMON_HPP_

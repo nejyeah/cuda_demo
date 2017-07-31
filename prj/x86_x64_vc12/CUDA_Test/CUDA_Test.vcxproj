@@ -23,6 +23,7 @@
     <ClInclude Include="..\..\..\demo\CUDA_Test\funset.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\demo\CUDA_Test\calculate_histogram.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\CUDA_Test.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\dot_product.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\funset.cpp" />
@@ -36,6 +37,7 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\vector_add.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\calculate_histogram.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\dot_product.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\green_ball.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cu" />

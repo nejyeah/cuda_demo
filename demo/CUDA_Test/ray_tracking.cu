@@ -166,15 +166,18 @@ int ray_tracking_gpu(const float* a, const float* b, const float* c, int sphere_
 	//cudaMemcpy(dev_spheres, spheres.get(), sizeof(Sphere) * sphere_num, cudaMemcpyHostToDevice);
 
 	// method2: 使用常量内存
-	/* cudaMemcpyToSymbol: 
-	cudaMemcpyToSymbol和cudaMemcpy参数为cudaMemcpyHostToDevice时的唯一差异在于cudaMemcpyToSymbol会复制到
-	常量内存，而cudaMemcpy会复制到全局内存
-	*/
+	/* cudaMemcpyToSymbol: cudaMemcpyToSymbol和cudaMemcpy参数为
+	cudaMemcpyHostToDevice时的唯一差异在于cudaMemcpyToSymbol会复制到常量内
+	存，而cudaMemcpy会复制到全局内存 */
 	cudaMemcpyToSymbol(dev_spheres, spheres.get(), sizeof(Sphere)* sphere_num);
 
 	const int threads_block{ 16 };
+	/* dim3: 基于uint3定义的内置矢量类型，相当于由3个unsigned int类型组成的
+	结构体，可表示一个三维数组，在定义dim3类型变量时，凡是没有赋值的元素都
+	会被赋予默认值1 */
 	dim3 blocks(width / threads_block, height / threads_block);
 	dim3 threads(threads_block, threads_block);
+
 	/* <<< >>>: 为CUDA引入的运算符,指定线程网格和线程块维度等,传递执行参
 	数给CUDA编译器和运行时系统,用于说明内核函数中的线程数量,以及线程是如何
 	组织的;尖括号中这些参数并不是传递给设备代码的参数,而是告诉运行时如何
