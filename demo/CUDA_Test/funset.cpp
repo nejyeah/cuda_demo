@@ -8,6 +8,40 @@
 #include "common.hpp"
 #include <opencv2/opencv.hpp>
 
+int test_streams()
+{
+	const int length{ 1024 * 1024 * 20};
+	std::unique_ptr<int[]> A(new int[length]);
+	std::unique_ptr<int[]> B(new int[length]);
+	std::unique_ptr<int[]> C1(new int[length]);
+	std::unique_ptr<int[]> C2(new int[length]);
+
+	generator_random_number<int>(A.get(), length, -100, 100);
+	generator_random_number<int>(B.get(), length, -100, 100);
+	std::for_each(C1.get(), C1.get() + length, [](int& n) {n = 0; });
+	std::for_each(C2.get(), C2.get() + length, [](int& n) {n = 0; });
+
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+
+	int ret = streams_cpu(A.get(), B.get(), C1.get(), length, &elapsed_time1);
+	if (ret != 0) PRINT_ERROR_INFO(streams_cpu);
+
+	ret = streams_gpu(A.get(), B.get(), C2.get(), length, &elapsed_time2);
+	if (ret != 0) PRINT_ERROR_INFO(streams_gpu);
+
+	for (int i = 0; i < length; ++i) {
+		if (C1[i] != C2[i]) {
+			fprintf(stderr, "their values are different at: %d, val1: %d, val2: %d\n",
+				i, C1[i], C2[i]);
+			return -1;
+		}
+	}
+
+	fprintf(stderr, "test streams' usage: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	return 0;
+}
+
 int test_calculate_histogram()
 {
 	const int length{ 10 * 1024 * 1024 }; // 100MB

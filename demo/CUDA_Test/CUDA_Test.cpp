@@ -3,7 +3,7 @@
 
 int main()
 {
-	int ret = test_calculate_histogram();
+	int ret = test_streams();
 
 	if (ret == 0) fprintf(stderr, "***** test success *****\n");
 	else fprintf(stderr, "===== test fail =====\n");

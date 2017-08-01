@@ -34,6 +34,7 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\matrix_mul.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\ray_tracking.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\ripple.cpp" />
+    <ClCompile Include="..\..\..\demo\CUDA_Test\streams.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\vector_add.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +47,7 @@
     <CudaCompile Include="..\..\..\demo\CUDA_Test\matrix_mul.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\ray_tracking.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\ripple.cu" />
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\streams.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\vector_add.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

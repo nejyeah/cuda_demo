@@ -1,6 +1,10 @@
 #ifndef FBC_CUDA_TEST_FUNSET_HPP_
 #define FBC_CUDA_TEST_FUNSET_HPP_
 
+int test_streams();
+int streams_cpu(const int* a, const int* b, int* c, int length, float* elapsed_time);
+int streams_gpu(const int* a, const int* b, int* c, int length, float* elapsed_time);
+
 int test_calculate_histogram();
 int calculate_histogram_cpu(const unsigned char* data, int length, size_t* hist, size_t& value, float* elapsed_time);
 int calculate_histogram_gpu(const unsigned char* data, int length, size_t* hist, size_t& value, float* elapsed_time);
