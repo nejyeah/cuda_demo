@@ -81,7 +81,7 @@ __global__ static void dot_product(const float* A, const float* B, float* partia
 		partial_C[blockIdx.x] = cache[0];
 }
 
-int dot_product_gpu(const float* A, const float* B, float* value, int elements_num, float* elapsed_time)
+static int dot_product_gpu_1(const float* A, const float* B, float* value, int elements_num, float* elapsed_time)
 {
 	/* cudaEvent_t: CUDA event types,结构体类型, CUDA事件,用于测量GPU在某
 	个任务上花费的时间,CUDA中的事件本质上是一个GPU时间戳,由于CUDA事件是在
@@ -165,4 +165,114 @@ int dot_product_gpu(const float* A, const float* B, float* value, int elements_n
 	cudaEventDestroy(stop);
 
 	return 0;
+}
+
+static int dot_product_gpu_2(const float* A, const float* B, float* value, int elements_num, float* elapsed_time)
+{
+	// cudaDeviceProp: cuda设备属性结构体
+	cudaDeviceProp prop;
+	int count;
+	// cudaGetDeviceCount: 获得计算能力设备的数量
+	cudaGetDeviceCount(&count);
+	//fprintf(stderr, "device count: %d\n", count);
+	int whichDevice;
+	// cudaGetDevice: 获得当前正在使用的设备ID，设备ID从0开始编号
+	cudaGetDevice(&whichDevice);
+	// cudaGetDeviceProperties: 获取GPU设备相关信息
+	cudaGetDeviceProperties(&prop, whichDevice);
+	// cudaDeviceProp::canMapHostMemory: GPU是否支持设备映射主机内存
+	if (prop.canMapHostMemory != 1) {
+		fprintf(stderr, "Device cannot map memory.\n");
+		return -1;
+	}
+	
+	// cudaSetDeviceFlags: 设置设备要用于执行的标志
+	// 将设备置入能分配零拷贝内存的状态
+	cudaSetDeviceFlags(cudaDeviceMapHost);
+
+	cudaEvent_t start, stop;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+	cudaEventRecord(start, 0);
+
+	const int threadsPerBlock{ 256 };
+	const int blocksPerGrid = std::min(64, (elements_num + threadsPerBlock - 1) / threadsPerBlock);
+
+	size_t lengthA{ elements_num * sizeof(float) }, lengthB{ elements_num * sizeof(float) };
+	float *d_A{ nullptr }, *d_B{ nullptr }, *d_partial_C{ nullptr };
+	float *a{ nullptr }, *b{ nullptr }, *partial_c{ nullptr };
+
+	/* cudaHostAlloc: 分配主机内存。C库函数malloc将分配标准的，可
+	分页的(Pagable)主机内存，而cudaHostAlloc将分配页锁定的主机内存。页锁定内
+	存也称为固定内存(Pinned Memory)或者不可分页内存，它有一个重要的属性：操作系
+	统将不会对这块内存分页并交换到磁盘上，从而确保了该内存始终驻留在物理内
+	存中。因此，操作系统能够安全地使某个应用程序访问该内存的物理地址，因为
+	这块内存将不会被破坏或者重新定位。由于GPU知道内存的物理地址，因此可以通
+	过"直接内存访问(Direct Memory Access, DMA)"技术来在GPU和主机之间复制数据。
+	固定内存是一把双刃剑。当使用固定内存时，你将失去虚拟内存的所有功能。
+	建议：仅对cudaMemcpy调用中的源内存或者目标内存，才使用页锁定内存，并且在
+	不再需要使用它们时立即释放。
+	零拷贝内存：通过cudaHostAlloc函数+cudaHostAllocMapped参数，而固定内存是
+	cudaHostAlloc函数+cudaHostAllocDefault参数。通过cudaHostAllocMapped分配
+	的主机内存也是固定的，它与通过cudaHostAllocDefault分配的固定内存有着相同
+	的属性。但这种内存除了可以用于主机与GPU之间的内存复制外，还可以在CUDA C核
+	函数中直接访问这种类型的主机内存，而不需要复制到GPU，因此也称为零拷贝内存。
+	cudaHostAllocMapped：这个标志告诉运行时将从GPU中访问这块内存。
+	cudaHostAllocWriteCombined：这个标志表示，运行时应该将内存分配为"合并式写
+	入(Write-Combined)"内存。这个标志并不会改变应用程序的性能，但却可以显著地
+	提升GPU读取内存时的性能。然而，当CPU也要读取这块内存时，"合并式写入"会显得
+	很低效。
+	对于集成GPU，使用零拷贝内存通常都会带来性能提升，因为内存在物理上与主机是
+	共享的。将缓冲区声明为零拷贝内存的唯一作用就是避免不必要的数据复制。所有类型
+	的固定内存都存在一定的局限性，零拷贝内存同样不例外：每个固定内存都会占用系统
+	的可用物理内存，这最终将降低系统的性能。
+	当输入内存和输出内存都只能使用一次时，那么在独立GPU上使用零拷贝内存将带来性能提升。 */
+	// allocate the memory on the CPU
+	cudaHostAlloc(&a, lengthA, cudaHostAllocWriteCombined | cudaHostAllocMapped);
+	cudaHostAlloc(&b, lengthB, cudaHostAllocWriteCombined | cudaHostAllocMapped);
+	cudaHostAlloc(&partial_c, blocksPerGrid * sizeof(float), cudaHostAllocMapped);
+
+	/* cudaHostGetDevicePointer: 获得由cudaHostAlloc分配的映射主机内存的设备指针。
+	由于GPU的虚拟内存空间地址映射与CPU不同，而cudaHostAlloc返回的是CPU上的指针，
+	因此需要调用cudaHostGetDevicePointer函数来获得这块内存在GPU上的有效指针。这些指针
+	将被传递给核函数，并在随后由GPU对这块内存执行读取和写入等操作 */
+	// find out the GPU pointers
+	cudaHostGetDevicePointer(&d_A, a, 0);
+	cudaHostGetDevicePointer(&d_B, b, 0);
+	cudaHostGetDevicePointer(&d_partial_C, partial_c, 0);
+
+	memcpy(a, A, lengthA);
+	memcpy(b, B, lengthB);
+
+	dot_product << < blocksPerGrid, threadsPerBlock >> >(d_A, d_B, d_partial_C, elements_num);
+
+	/* cudaThreadSynchronize: 等待计算设备完成, 将CPU与GPU同步*/
+	cudaThreadSynchronize();
+
+	*value = 0.f;
+	for (int i = 0; i < blocksPerGrid; ++i) {
+		(*value) += partial_c[i];
+	}
+
+	// cudaFreeHost: 释放设备上由cudaHostAlloc函数分配的内存
+	cudaFreeHost(d_A);
+	cudaFreeHost(d_B);
+	cudaFreeHost(d_partial_C);
+
+	cudaEventRecord(stop, 0);
+	cudaEventSynchronize(stop);
+	cudaEventElapsedTime(elapsed_time, start, stop);
+	cudaEventDestroy(start);
+	cudaEventDestroy(stop);
+
+	return 0;
+}
+
+int dot_product_gpu(const float* A, const float* B, float* value, int elements_num, float* elapsed_time)
+{
+	int ret{ 0 };
+	//ret = dot_product_gpu_1(A, B, value, elements_num, elapsed_time); // 普通实现
+	ret = dot_product_gpu_2(A, B, value, elements_num, elapsed_time); // 通过零拷贝内存实现
+
+	return ret;
 }
