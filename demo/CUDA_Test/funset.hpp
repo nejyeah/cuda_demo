@@ -1,6 +1,10 @@
 #ifndef FBC_CUDA_TEST_FUNSET_HPP_
 #define FBC_CUDA_TEST_FUNSET_HPP_
 
+int test_matrix_mul();
+int matrix_mul_cpu(const float* A, const float* B, float* C, int colsA, int rowsA, int colsB, int rowsB, float* elapsed_time);
+int matrix_mul_gpu(const float* A, const float* B, float* C, int colsA, int rowsA, int colsB, int rowsB, float* elapsed_time);
+
 int test_streams();
 int streams_cpu(const int* a, const int* b, int* c, int length, float* elapsed_time);
 int streams_gpu(const int* a, const int* b, int* c, int length, float* elapsed_time);
@@ -28,10 +32,6 @@ int ripple_gpu(unsigned char* ptr, int width, int height, int ticks, float* elap
 int test_julia();
 int julia_cpu(unsigned char* ptr, int width, int height, float scale, float* elapsed_time);
 int julia_gpu(unsigned char* ptr, int width, int height, float scale, float* elapsed_time);
-
-int test_matrix_mul();
-int matrix_mul_cpu(const float* A, const float* B, float* C, int colsA, int rowsA, int colsB, int rowsB, float* elapsed_time);
-int matrix_mul_gpu(const float* A, const float* B, float* C, int colsA, int rowsA, int colsB, int rowsB, float* elapsed_time);
 
 int test_dot_product();
 int dot_product_cpu(const float* A, const float* B, float* value, int elements_num, float* elapsed_time);
