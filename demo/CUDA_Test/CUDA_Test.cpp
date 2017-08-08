@@ -3,7 +3,7 @@
 
 int main()
 {
-	int ret = test_matrix_mul();
+	int ret = test_get_device_info();
 
 	if (ret == 0) fprintf(stderr, "***** test success *****\n");
 	else fprintf(stderr, "===== test fail =====\n");

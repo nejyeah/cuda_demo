@@ -8,6 +8,60 @@
 #include "common.hpp"
 #include <opencv2/opencv.hpp>
 
+int test_get_device_info()
+{
+	int ret = get_device_info();
+	if (ret != 0) PRINT_ERROR_INFO(get_device_info);
+
+	return 0;
+}
+
+int test_image_normalize()
+{
+	std::string image_name{ "E:/GitCode/CUDA_Test/test_images/lena.png" };
+	cv::Mat matSrc = cv::imread(image_name);
+	if (!matSrc.data) {
+		fprintf(stderr, "read image fail: %s\n", image_name.c_str());
+		return -1;
+	}
+	
+	const int width{ 511 }, height{ 473 }, channels{ 3 };
+	//cv::cvtColor(matSrc, matSrc, CV_BGR2GRAY);
+	cv::resize(matSrc, matSrc, cv::Size(width, height));
+	matSrc.convertTo(matSrc, CV_32FC3);
+	std::vector<cv::Mat> matSplit;
+	cv::split(matSrc, matSplit);
+	CHECK(matSplit.size() == channels);
+	std::unique_ptr<float[]> data(new float[matSplit[0].cols * matSplit[0].rows * channels]);
+	size_t length{ matSplit[0].cols * matSplit[0].rows * sizeof(float) };
+	for (int i = 0; i < channels; ++i) {
+		memcpy(data.get() + matSplit[0].cols * matSplit[0].rows * i, matSplit[i].data, length);
+	}
+
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+	std::unique_ptr<float[]> dst1(new float[matSplit[0].cols * matSplit[0].rows * channels]);
+	std::unique_ptr<float[]> dst2(new float[matSplit[0].cols * matSplit[0].rows * channels]);
+
+	int ret = image_normalize_cpu(data.get(), dst1.get(), width, height, channels, &elapsed_time1);
+	if (ret != 0) PRINT_ERROR_INFO(image_normalize_cpu);
+
+	ret = image_normalize_gpu(data.get(), dst2.get(), width, height, channels, &elapsed_time2);
+	if (ret != 0) PRINT_ERROR_INFO(image_normalize_gpu);
+
+	int count{ 0 }, num{width * height * channels};
+	for (int i = 0; i < num; ++i) {
+		if (fabs(dst1[i] - dst2[i]) > 0.01/*EPS_*/) {
+			fprintf(stderr, "index: %d, val1: %f, val2: %f\n", i, dst1[i], dst2[i]);
+			++count;
+		}
+		if (count > 100) return -1;
+	}
+
+	fprintf(stderr, "test image normalize: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	return 0;
+}
+
 int test_matrix_mul()
 {
 	// Matrix multiplication: C = A * B
