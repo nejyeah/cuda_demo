@@ -3,7 +3,7 @@
 
 int main()
 {
-	int ret = test_get_device_info();
+	int ret = test_image_normalize();
 
 	if (ret == 0) fprintf(stderr, "***** test success *****\n");
 	else fprintf(stderr, "===== test fail =====\n");

@@ -8,14 +8,6 @@
 #include "common.hpp"
 #include <opencv2/opencv.hpp>
 
-int test_get_device_info()
-{
-	int ret = get_device_info();
-	if (ret != 0) PRINT_ERROR_INFO(get_device_info);
-
-	return 0;
-}
-
 int test_image_normalize()
 {
 	std::string image_name{ "E:/GitCode/CUDA_Test/test_images/lena.png" };
@@ -24,9 +16,8 @@ int test_image_normalize()
 		fprintf(stderr, "read image fail: %s\n", image_name.c_str());
 		return -1;
 	}
-	
+
 	const int width{ 511 }, height{ 473 }, channels{ 3 };
-	//cv::cvtColor(matSrc, matSrc, CV_BGR2GRAY);
 	cv::resize(matSrc, matSrc, cv::Size(width, height));
 	matSrc.convertTo(matSrc, CV_32FC3);
 	std::vector<cv::Mat> matSplit;
@@ -48,7 +39,7 @@ int test_image_normalize()
 	ret = image_normalize_gpu(data.get(), dst2.get(), width, height, channels, &elapsed_time2);
 	if (ret != 0) PRINT_ERROR_INFO(image_normalize_gpu);
 
-	int count{ 0 }, num{width * height * channels};
+	int count{ 0 }, num{ width * height * channels };
 	for (int i = 0; i < num; ++i) {
 		if (fabs(dst1[i] - dst2[i]) > 0.01/*EPS_*/) {
 			fprintf(stderr, "index: %d, val1: %f, val2: %f\n", i, dst1[i], dst2[i]);
@@ -57,7 +48,26 @@ int test_image_normalize()
 		if (count > 100) return -1;
 	}
 
+	std::vector<cv::Mat> merge(channels);
+	for (int i = 0; i < channels; ++i) {
+		merge[i] = cv::Mat(height, width, CV_32FC1, dst2.get() + i * width * height);
+	}
+	cv::Mat dst3;
+	cv::merge(merge, dst3);
+	dst3.convertTo(dst3, CV_8UC3, 255.f);
+	cv::imwrite("E:/GitCode/CUDA_Test/test_images/image_normalize.png", dst3);
+	//cv::resize(matSrc, matSrc, cv::Size(width, height));
+	//cv::imwrite("E:/GitCode/CUDA_Test/test_images/image_src.png", matSrc);
+
 	fprintf(stderr, "test image normalize: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	return 0;
+}
+
+int test_get_device_info()
+{
+	int ret = get_device_info();
+	if (ret != 0) PRINT_ERROR_INFO(get_device_info);
 
 	return 0;
 }
