@@ -6,7 +6,43 @@
 #include <string>
 #include <algorithm>
 #include "common.hpp"
-#include <opencv2/opencv.hpp>
+
+int test_image_reverse()
+{
+	std::string image_name{ "E:/GitCode/CUDA_Test/test_images/lena.png" };
+	cv::Mat matSrc = cv::imread(image_name);
+	CHECK(matSrc.data);
+
+	cv::cvtColor(matSrc, matSrc, CV_BGR2GRAY);
+	const int width{ 1511 }, height{ 1473 };
+	const auto length = width * height;
+	cv::resize(matSrc, matSrc, cv::Size(width, height));
+	cv::Mat matTmp1;
+	matSrc.convertTo(matTmp1, CV_32FC1);
+
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+	const std::vector<int> vec{ 5, 7};
+	std::unique_ptr<float[]> dst1(new float[length]), dst2(new float[length]);
+	std::for_each(dst1.get(), dst1.get() + length, [](float& n) {n = 0.f; });
+	std::for_each(dst2.get(), dst2.get() + length, [](float& n) {n = 0.f; });
+
+	int ret = image_reverse_cpu((float*)matTmp1.data, dst1.get(), length, vec, &elapsed_time1);
+	if (ret != 0) PRINT_ERROR_INFO(image_reverse_cpu);
+
+	ret = image_reverse_gpu((float*)matTmp1.data, dst2.get(), length, vec, &elapsed_time2);
+	if (ret != 0) PRINT_ERROR_INFO(image_reverse_gpu);
+
+	compare_result(dst1.get(), dst2.get(), length);
+
+	cv::Mat matTmp2(height, width, CV_32FC1, dst2.get()), matDst;
+	matTmp2.convertTo(matDst, CV_8UC1);
+
+	save_image(matSrc, matDst, 400, 200, "E:/GitCode/CUDA_Test/test_images/image_reverse.png");
+
+	fprintf(stderr, "test image reverse: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	return 0;
+}
 
 int test_image_normalize()
 {

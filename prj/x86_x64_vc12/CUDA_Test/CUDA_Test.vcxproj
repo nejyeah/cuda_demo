@@ -30,6 +30,7 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\green_ball.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\image_normalize.cpp" />
+    <ClCompile Include="..\..\..\demo\CUDA_Test\image_reverse.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\julia.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\long_vector_add.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\matrix_mul.cpp" />
@@ -45,6 +46,7 @@
     <CudaCompile Include="..\..\..\demo\CUDA_Test\green_ball.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\image_normalize.cu" />
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\image_reverse.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\julia.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\long_vector_add.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\matrix_mul.cu" />

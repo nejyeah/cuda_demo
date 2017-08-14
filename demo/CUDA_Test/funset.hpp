@@ -1,6 +1,12 @@
 #ifndef FBC_CUDA_TEST_FUNSET_HPP_
 #define FBC_CUDA_TEST_FUNSET_HPP_
 
+#include <vector>
+
+int test_image_reverse();
+int image_reverse_cpu(const float* src, float* dst, int length, const std::vector<int>& vec, float* elapsed_time);
+int image_reverse_gpu(const float* src, float* dst, int length, const std::vector<int>& vec, float* elapsed_time);
+
 int test_image_normalize();
 int image_normalize_cpu(const float* src, float* dst, int width, int height, int channels, float* elapsed_time);
 int image_normalize_gpu(const float* src, float* dst, int width, int height, int channels, float* elapsed_time);

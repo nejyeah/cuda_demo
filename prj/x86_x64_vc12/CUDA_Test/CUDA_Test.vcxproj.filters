@@ -65,6 +65,9 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\image_normalize.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\demo\CUDA_Test\image_reverse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\vector_add.cu">
@@ -104,6 +107,9 @@
       <Filter>源文件</Filter>
     </CudaCompile>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\device_info.cu">
+      <Filter>源文件</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\image_reverse.cu">
       <Filter>源文件</Filter>
     </CudaCompile>
   </ItemGroup>
