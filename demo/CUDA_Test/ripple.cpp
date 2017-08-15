@@ -1,4 +1,5 @@
 #include "funset.hpp"
+#include <cmath>
 #include <chrono>
 
 int ripple_cpu(unsigned char* ptr, int width, int height, int ticks, float* elapsed_time)

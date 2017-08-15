@@ -13,7 +13,7 @@
 设备上执行函数时的grid和block的维度,以及相关的流(即插入<<<   >>>运算符);
 a kernel,表示此函数为内核函数(运行在GPU上的CUDA并行计算函数称为kernel(内核函
 数),内核函数必须通过__global__函数类型限定符定义); */
-__global__ static void calculate_histogram(const unsigned char* data, int length, size_t* hist)
+__global__ static void calculate_histogram(const unsigned char* data, int length, unsigned int* hist)
 {
 	/* __shared__: 变量类型限定符；使用__shared__限定符，或者与__device__限
 	定符连用，此时声明的变量位于block中的共享存储器空间中，与block具有相同
@@ -24,7 +24,7 @@ __global__ static void calculate_histogram(const unsigned char* data, int length
 	器对共享内存中的变量与普通变量将分别采取不同的处理方式 */
 	// clear out the accumulation buffer called temp since we are launched with
 	// 256 threads, it is easy to clear that memory with one write per thread
-	__shared__  size_t temp[256]; // 共享内存缓冲区
+	__shared__  unsigned int temp[256]; // 共享内存缓冲区
 	temp[threadIdx.x] = 0;
 	/* __syncthreads: 对线程块中的线程进行同步；CUDA架构将确保，除非线程块
 	中的每个线程都执行了__syncthreads()，否则没有任何线程能执行
@@ -78,7 +78,7 @@ __global__ static void calculate_histogram(const unsigned char* data, int length
 	atomicAdd(&(hist[threadIdx.x]), temp[threadIdx.x]);
 }
 
-int calculate_histogram_gpu(const unsigned char* data, int length, size_t* hist, size_t& value, float* elapsed_time)
+int calculate_histogram_gpu(const unsigned char* data, int length, unsigned int* hist, unsigned int& value, float* elapsed_time)
 {
 	/* cudaEvent_t: CUDA event types,结构体类型, CUDA事件,用于测量GPU在某
 	个任务上花费的时间,CUDA中的事件本质上是一个GPU时间戳,由于CUDA事件是在
@@ -91,11 +91,11 @@ int calculate_histogram_gpu(const unsigned char* data, int length, size_t* hist,
 	cudaEventRecord(start, 0);
 
 	unsigned char* dev_buffer{ nullptr };
-	size_t* dev_hist{ nullptr };
+	unsigned int* dev_hist{ nullptr };
 
 	// cudaMalloc: 在设备端分配内存
 	cudaMalloc(&dev_buffer, length);
-	cudaMalloc(&dev_hist, 256 * sizeof(size_t));
+	cudaMalloc(&dev_hist, 256 * sizeof(unsigned int));
 
 	/* cudaMemcpy: 在主机端和设备端拷贝数据,此函数第四个参数仅能是下面之一:
 	(1). cudaMemcpyHostToHost: 拷贝数据从主机端到主机端
@@ -109,7 +109,7 @@ int calculate_histogram_gpu(const unsigned char* data, int length, size_t* hist,
 
 	/* cudaMemset: 存储器初始化函数,在GPU内存上执行。用指定的值初始化或设置
 	设备内存 */
-	cudaMemset(dev_hist, 0, 256 * sizeof(size_t));
+	cudaMemset(dev_hist, 0, 256 * sizeof(unsigned int));
 
 	// cudaDeviceProp: cuda设备属性结构体
 	// kernel launch - 2x the number of mps gave best timing
@@ -131,14 +131,14 @@ int calculate_histogram_gpu(const unsigned char* data, int length, size_t* hist,
 	的形式设置执行配置,其中：Dg是一个dim3型变量,用于设置grid的维度和各个
 	维度上的尺寸.设置好Dg后,grid中将有Dg.x*Dg.y个block,Dg.z必须为1;Db是
 	一个dim3型变量,用于设置block的维度和各个维度上的尺寸.设置好Db后,每个
-	block中将有Db.x*Db.y*Db.z个thread;Ns是一个size_t型变量,指定各块为此调
+	block中将有Db.x*Db.y*Db.z个thread;Ns是一个unsigned int型变量,指定各块为此调
 	用动态分配的共享存储器大小,这些动态分配的存储器可供声明为外部数组
 	(extern __shared__)的其他任何变量使用;Ns是一个可选参数,默认值为0;S为
 	cudaStream_t类型,用于设置与内核函数关联的流.S是一个可选参数,默认值0. */
 	// 当线程块的数量为GPU中处理器数量的2倍时，将达到最优性能
 	calculate_histogram << <blocks * 2, 256 >> >(dev_buffer, length, dev_hist);
 
-	cudaMemcpy(hist, dev_hist, 256 * sizeof(size_t), cudaMemcpyDeviceToHost);
+	cudaMemcpy(hist, dev_hist, 256 * sizeof(unsigned int), cudaMemcpyDeviceToHost);
 
 	value = 0;
 	for (int i = 0; i < 256; ++i) {

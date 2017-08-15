@@ -2,7 +2,7 @@
 #include <chrono>
 #include "common.hpp"
 
-int calculate_histogram_cpu(const unsigned char* data, int length, size_t* hist, size_t& value, float* elapsed_time)
+int calculate_histogram_cpu(const unsigned char* data, int length, unsigned int* hist, unsigned int& value, float* elapsed_time)
 {
 	auto start = std::chrono::steady_clock::now();
 

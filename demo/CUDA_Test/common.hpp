@@ -1,7 +1,10 @@
 #ifndef FBC_CUDA_TEST_COMMON_HPP_
 #define FBC_CUDA_TEST_COMMON_HPP_
 
+#include <typeinfo>
 #include<random>
+#include <cuda_runtime.h> // For the CUDA runtime routines (prefixed with "cuda_")
+#include <device_launch_parameters.h>
 #include <opencv2/opencv.hpp>
 
 template< typename T >

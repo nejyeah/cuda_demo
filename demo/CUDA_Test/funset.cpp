@@ -211,12 +211,12 @@ int test_calculate_histogram()
 	generator_random_number<unsigned char>(data.get(), length, 0, 255);
 
 	const int hist_size{ 256 };
-	std::unique_ptr<size_t[]> hist1(new size_t[hist_size]), hist2(new size_t[hist_size]);
-	std::for_each(hist1.get(), hist1.get() + hist_size, [](size_t& n) {n = 0; });
-	std::for_each(hist2.get(), hist2.get() + hist_size, [](size_t& n) {n = 0; });
+	std::unique_ptr<unsigned int[]> hist1(new unsigned int[hist_size]), hist2(new unsigned int[hist_size]);
+	std::for_each(hist1.get(), hist1.get() + hist_size, [](unsigned int& n) {n = 0; });
+	std::for_each(hist2.get(), hist2.get() + hist_size, [](unsigned int& n) {n = 0; });
 
 	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
-	size_t value1{ 0 }, value2{ 0 };
+	unsigned int value1{ 0 }, value2{ 0 };
 
 	int ret = calculate_histogram_cpu(data.get(), length, hist1.get(), value1, &elapsed_time1);
 	if (ret != 0) PRINT_ERROR_INFO(calculate_histogram_cpu);

@@ -13,7 +13,9 @@
 - approximate image normalize(mean/standard deviation)
 - approximate image reverse
 
-**The project support platform: windows10 64 bits. It can be directly build with VS2013 in windows10 64bits.**
+**The project support platform: **
+- windows10 64 bits: It can be directly build with VS2013 in windows10 64bits.
+- Linux: It supports cmake build(file position: prj/linux_cmake)
 
 **Screenshot:**  
 ![](https://github.com/fengbingchun/CUDA_Test/blob/master/prj/x86_x64_vc12/Screenshot.png)
