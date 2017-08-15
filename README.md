@@ -13,7 +13,7 @@
 - approximate image normalize(mean/standard deviation)
 - approximate image reverse
 
-**The project support platform: **
+**The project support platform:**
 - windows10 64 bits: It can be directly build with VS2013 in windows10 64bits.
 - Linux: It supports cmake build(file position: prj/linux_cmake)
 
