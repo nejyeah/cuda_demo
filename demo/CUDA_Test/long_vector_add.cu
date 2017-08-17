@@ -14,7 +14,7 @@ __global__ static void long_vector_add(const float *A, const float *B, float *C,
 {
 	/* gridDim: 内置变量,用于描述线程网格的维度,对于所有线程块来说,这个
 	变量是一个常数,用来保存线程格每一维的大小,即每个线程格中线程块的数量.
-	一个grid最多只有二维,为dim3类型；
+	一个grid为三维,为dim3类型；
 	blockDim: 内置变量,用于说明每个block的维度与尺寸.为dim3类型,包含
 	了block在三个维度上的尺寸信息;对于所有线程块来说,这个变量是一个常数,
 	保存的是线程块中每一维的线程数量;
@@ -77,7 +77,7 @@ int long_vector_add_gpu(const float* A, const float* B, float* C, int elements_n
 	GPU计算时会发生错误,例如越界等;
 	使用运行时API时,需要在调用的内核函数名与参数列表直接以<<<Dg,Db,Ns,S>>>
 	的形式设置执行配置,其中：Dg是一个dim3型变量,用于设置grid的维度和各个
-	维度上的尺寸.设置好Dg后,grid中将有Dg.x*Dg.y个block,Dg.z必须为1;Db是
+	维度上的尺寸.设置好Dg后,grid中将有Dg.x*Dg.y*Dg.z个block;Db是
 	一个dim3型变量,用于设置block的维度和各个维度上的尺寸.设置好Db后,每个
 	block中将有Db.x*Db.y*Db.z个thread;Ns是一个size_t型变量,指定各块为此调
 	用动态分配的共享存储器大小,这些动态分配的存储器可供声明为外部数组

@@ -17,7 +17,7 @@ __global__ static void stream_kernel(int* a, int* b, int* c, int length)
 {
 	/* gridDim: 内置变量,用于描述线程网格的维度,对于所有线程块来说,这个
 	变量是一个常数,用来保存线程格每一维的大小,即每个线程格中线程块的数量.
-	一个grid最多只有二维,为dim3类型；
+	一个grid为三维,为dim3类型；
 	blockDim: 内置变量,用于说明每个block的维度与尺寸.为dim3类型,包含
 	了block在三个维度上的尺寸信息;对于所有线程块来说,这个变量是一个常数,
 	保存的是线程块中每一维的线程数量;
@@ -115,6 +115,21 @@ int streams_gpu_1(const int* a, const int* b, int* c, int length, float* elapsed
 		cudaMemcpyAsync(dev_a, host_a + i, N * sizeof(int), cudaMemcpyHostToDevice, stream);
 		cudaMemcpyAsync(dev_b, host_b + i, N * sizeof(int), cudaMemcpyHostToDevice, stream);
 
+		/* <<< >>>: 为CUDA引入的运算符,指定线程网格和线程块维度等,传递执行参
+		数给CUDA编译器和运行时系统,用于说明内核函数中的线程数量,以及线程是如何
+		组织的;尖括号中这些参数并不是传递给设备代码的参数,而是告诉运行时如何
+		启动设备代码,传递给设备代码本身的参数是放在圆括号中传递的,就像标准的函
+		数调用一样;不同计算能力的设备对线程的总数和组织方式有不同的约束;必须
+		先为kernel中用到的数组或变量分配好足够的空间,再调用kernel函数,否则在
+		GPU计算时会发生错误,例如越界等;
+		使用运行时API时,需要在调用的内核函数名与参数列表直接以<<<Dg,Db,Ns,S>>>
+		的形式设置执行配置,其中：Dg是一个dim3型变量,用于设置grid的维度和各个
+		维度上的尺寸.设置好Dg后,grid中将有Dg.x*Dg.y*Dg.z个block;Db是
+		一个dim3型变量,用于设置block的维度和各个维度上的尺寸.设置好Db后,每个
+		block中将有Db.x*Db.y*Db.z个thread;Ns是一个size_t型变量,指定各块为此调
+		用动态分配的共享存储器大小,这些动态分配的存储器可供声明为外部数组
+		(extern __shared__)的其他任何变量使用;Ns是一个可选参数,默认值为0;S为
+		cudaStream_t类型,用于设置与内核函数关联的流.S是一个可选参数,默认值0. */
 		stream_kernel << <N / 256, 256, 0, stream >> >(dev_a, dev_b, dev_c, N);
 
 		cudaMemcpyAsync(host_c + i, dev_c, N * sizeof(int), cudaMemcpyDeviceToHost, stream);
