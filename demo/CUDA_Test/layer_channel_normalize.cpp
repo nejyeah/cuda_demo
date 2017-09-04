@@ -3,7 +3,7 @@
 #include <chrono>
 #include "common.hpp"
 
-int image_normalize_cpu(const float* src, float* dst, int width, int height, int channels, float* elapsed_time)
+int layer_channel_normalize_cpu(const float* src, float* dst, int width, int height, int channels, float* elapsed_time)
 {
 	auto start = std::chrono::steady_clock::now();
 

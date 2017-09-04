@@ -4,13 +4,13 @@
 #include <cstdlib>
 #include <vector>
 
-int test_image_reverse();
-int image_reverse_cpu(const float* src, float* dst, int length, const std::vector<int>& vec, float* elapsed_time);
-int image_reverse_gpu(const float* src, float* dst, int length, const std::vector<int>& vec, float* elapsed_time);
+int test_layer_reverse();
+int layer_reverse_cpu(const float* src, float* dst, int length, const std::vector<int>& vec, float* elapsed_time);
+int layer_reverse_gpu(const float* src, float* dst, int length, const std::vector<int>& vec, float* elapsed_time);
 
-int test_image_normalize();
-int image_normalize_cpu(const float* src, float* dst, int width, int height, int channels, float* elapsed_time);
-int image_normalize_gpu(const float* src, float* dst, int width, int height, int channels, float* elapsed_time);
+int test_layer_channel_normalize();
+int layer_channel_normalize_cpu(const float* src, float* dst, int width, int height, int channels, float* elapsed_time);
+int layer_channel_normalize_gpu(const float* src, float* dst, int width, int height, int channels, float* elapsed_time);
 
 int test_get_device_info();
 int get_device_info();

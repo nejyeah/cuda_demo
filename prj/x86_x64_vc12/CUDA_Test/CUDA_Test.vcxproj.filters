@@ -62,10 +62,10 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\streams.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\demo\CUDA_Test\image_normalize.cpp">
+    <ClCompile Include="..\..\..\demo\CUDA_Test\layer_channel_normalize.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\demo\CUDA_Test\image_reverse.cpp">
+    <ClCompile Include="..\..\..\demo\CUDA_Test\layer_reverse.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -103,13 +103,13 @@
     <CudaCompile Include="..\..\..\demo\CUDA_Test\streams.cu">
       <Filter>源文件</Filter>
     </CudaCompile>
-    <CudaCompile Include="..\..\..\demo\CUDA_Test\image_normalize.cu">
-      <Filter>源文件</Filter>
-    </CudaCompile>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\device_info.cu">
       <Filter>源文件</Filter>
     </CudaCompile>
-    <CudaCompile Include="..\..\..\demo\CUDA_Test\image_reverse.cu">
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\layer_channel_normalize.cu">
+      <Filter>源文件</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\layer_reverse.cu">
       <Filter>源文件</Filter>
     </CudaCompile>
   </ItemGroup>

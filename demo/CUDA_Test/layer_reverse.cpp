@@ -2,7 +2,7 @@
 #include <chrono>
 #include <algorithm>
 
-int image_reverse_cpu(const float* src, float* dst, int length, const std::vector<int>& vec, float* elapsed_time)
+int layer_reverse_cpu(const float* src, float* dst, int length, const std::vector<int>& vec, float* elapsed_time)
 {
 	auto start = std::chrono::steady_clock::now();
 

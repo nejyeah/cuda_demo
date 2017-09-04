@@ -1,22 +1,11 @@
 #include "funset.hpp"
 #include <iostream>
+#include <memory>
+#include <algorithm>
+#include <cmath>
 #include <cuda_runtime.h> // For the CUDA runtime routines (prefixed with "cuda_")
 #include <device_launch_parameters.h>
 #include "common.hpp"
-
-/* __device__: 函数类型限定符,表明被修饰的函数在设备上执行，只能从设备上调用，
-但只能在其它__device__函数或者__global__函数中调用；__device__函数不支持递归；
-__device__函数的函数体内不能声明静态变量；__device__函数的参数数目是不可变化的;
-不能对__device__函数取指针 */
-__device__ static int min_(int a, int b)
-{
-	return a > b ? b : a;
-}
-
-__device__ static int max_(int a, int b)
-{
-	return a > b ? a : b;
-}
 
 /* __global__: 函数类型限定符;在设备上运行;在主机端调用,计算能力3.2及以上可以在
 设备端调用;声明的函数的返回值必须是void类型;对此类型函数的调用是异步的,即在
@@ -24,7 +13,7 @@ __device__ static int max_(int a, int b)
 设备上执行函数时的grid和block的维度,以及相关的流(即插入<<<   >>>运算符);
 a kernel,表示此函数为内核函数(运行在GPU上的CUDA并行计算函数称为kernel(内核函
 数),内核函数必须通过__global__函数类型限定符定义);*/
-__global__ static void image_reverse(const float* src, float* dst, int length, int vec0, int vec1)
+__global__ static void layer_channel_normalize(const float* src, float* dst, int count, int offset)
 {
 	/* gridDim: 内置变量,用于描述线程网格的维度,对于所有线程块来说,这个
 	变量是一个常数,用来保存线程格每一维的大小,即每个线程格中线程块的数量.
@@ -40,23 +29,35 @@ __global__ static void image_reverse(const float* src, float* dst, int length, i
 	说明当前thread在block中的位置;如果线程是一维的可获取threadIdx.x,如果
 	是二维的还可获取threadIdx.y,如果是三维的还可获取threadIdx.z;为uint3类
 	型,包含了一个thread在block中各个维度的索引信息 */
-	auto index = threadIdx.x + blockIdx.x * blockDim.x;
+	int index = threadIdx.x + blockIdx.x * blockDim.x;
+	if (index > count - 1) return;
 
-	while (index < length) {
-		auto index1 = (index / vec0) % vec1;
-		auto index2 = vec0 * (vec1 - 2 * index1 - 1) + index;
-		index2 = max_(0, min_(length - 1, index2));
-		dst[index2] = src[index];
+	const float* input = src + index * offset;
+	float* output = dst + index * offset;
+	float mean{ 0.f }, sd{ 0.f };
 
-		index += blockDim.x * gridDim.x;
+	for (size_t i = 0; i < offset; ++i) { // Note: Debug mode
+		mean += input[i];
+		sd += pow(input[i], 2.f);
+		output[i] = input[i];
+	}
+
+	mean /= offset;
+	sd /= offset;
+	sd -= pow(mean, 2.f);
+	sd = sqrt(sd);
+	if (sd < EPS_) sd = 1.f;
+
+	for (size_t i = 0; i < offset; ++i) {
+		output[i] = (input[i] - mean) / sd;
 	}
 }
 
-int image_reverse_gpu(const float* src, float* dst, int length, const std::vector<int>& vec, float* elapsed_time)
+int layer_channel_normalize_gpu(const float* src, float* dst, int width, int height, int channels, float* elapsed_time)
 {
 	/* cudaEvent_t: CUDA event types,结构体类型, CUDA事件,用于测量GPU在某
 	个任务上花费的时间,CUDA中的事件本质上是一个GPU时间戳,由于CUDA事件是在
-	GPU上实现的,因此它们不适于对同时包含设备代码和主机代码的混合代码计时*/
+	GPU上实现的,因此它们不适于对同时包含设备代码和主机代码的混合代码计时 */
 	cudaEvent_t start, stop;
 	// cudaEventCreate: 创建一个事件对象,异步启动
 	cudaEventCreate(&start);
@@ -64,11 +65,12 @@ int image_reverse_gpu(const float* src, float* dst, int length, const std::vecto
 	// cudaEventRecord: 记录一个事件,异步启动,start记录起始时间
 	cudaEventRecord(start, 0);
 
-	float *d_src{ nullptr }, *d_dst{ nullptr };
+	float *dev_src{ nullptr }, *dev_dst{ nullptr };
+	size_t length{ width * height * channels * sizeof(float) };
 
 	// cudaMalloc: 在设备端分配内存
-	cudaMalloc(&d_src, length * sizeof(float));
-	cudaMalloc(&d_dst, length * sizeof(float));
+	cudaMalloc(&dev_src, length);
+	cudaMalloc(&dev_dst, length);
 
 	/* cudaMemcpy: 在主机端和设备端拷贝数据,此函数第四个参数仅能是下面之一:
 	(1). cudaMemcpyHostToHost: 拷贝数据从主机端到主机端
@@ -78,8 +80,7 @@ int image_reverse_gpu(const float* src, float* dst, int length, const std::vecto
 	(5). cudaMemcpyDefault: 从指针值自动推断拷贝数据方向,需要支持
 	统一虚拟寻址(CUDA6.0及以上版本)
 	cudaMemcpy函数对于主机是同步的 */
-	cudaMemcpy(d_src, src, length * sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(d_dst, dst, length * sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_src, src, length, cudaMemcpyHostToDevice);
 
 	/* <<< >>>: 为CUDA引入的运算符,指定线程网格和线程块维度等,传递执行参
 	数给CUDA编译器和运行时系统,用于说明内核函数中的线程数量,以及线程是如何
@@ -96,9 +97,13 @@ int image_reverse_gpu(const float* src, float* dst, int length, const std::vecto
 	用动态分配的共享存储器大小,这些动态分配的存储器可供声明为外部数组
 	(extern __shared__)的其他任何变量使用;Ns是一个可选参数,默认值为0;S为
 	cudaStream_t类型,用于设置与内核函数关联的流.S是一个可选参数,默认值0. */
-	image_reverse << <512, 512 >> >(d_src, d_dst, length, vec[0], vec[1]);
+	layer_channel_normalize << < channels, 512 >> >(dev_src, dev_dst, channels, width*height);
 
-	cudaMemcpy(dst, d_dst, length * sizeof(float), cudaMemcpyDeviceToHost);
+	cudaMemcpy(dst, dev_dst, length, cudaMemcpyDeviceToHost);
+
+	// cudaFree: 释放设备上由cudaMalloc函数分配的内存
+	cudaFree(dev_src);
+	cudaFree(dev_dst);
 
 	// cudaEventRecord: 记录一个事件,异步启动,stop记录结束时间
 	cudaEventRecord(stop, 0);
@@ -112,3 +117,6 @@ int image_reverse_gpu(const float* src, float* dst, int length, const std::vecto
 
 	return 0;
 }
+
+
+

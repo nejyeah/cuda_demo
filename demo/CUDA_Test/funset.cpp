@@ -7,7 +7,7 @@
 #include <algorithm>
 #include "common.hpp"
 
-int test_image_reverse()
+int test_layer_reverse()
 {
 	std::string image_name{ "E:/GitCode/CUDA_Test/test_images/lena.png" };
 	cv::Mat matSrc = cv::imread(image_name);
@@ -26,10 +26,10 @@ int test_image_reverse()
 	std::for_each(dst1.get(), dst1.get() + length, [](float& n) {n = 0.f; });
 	std::for_each(dst2.get(), dst2.get() + length, [](float& n) {n = 0.f; });
 
-	int ret = image_reverse_cpu((float*)matTmp1.data, dst1.get(), length, vec, &elapsed_time1);
+	int ret = layer_reverse_cpu((float*)matTmp1.data, dst1.get(), length, vec, &elapsed_time1);
 	if (ret != 0) PRINT_ERROR_INFO(image_reverse_cpu);
 
-	ret = image_reverse_gpu((float*)matTmp1.data, dst2.get(), length, vec, &elapsed_time2);
+	ret = layer_reverse_gpu((float*)matTmp1.data, dst2.get(), length, vec, &elapsed_time2);
 	if (ret != 0) PRINT_ERROR_INFO(image_reverse_gpu);
 
 	compare_result(dst1.get(), dst2.get(), length);
@@ -44,7 +44,7 @@ int test_image_reverse()
 	return 0;
 }
 
-int test_image_normalize()
+int test_layer_channel_normalize()
 {
 	std::string image_name{ "E:/GitCode/CUDA_Test/test_images/lena.png" };
 	cv::Mat matSrc = cv::imread(image_name);
@@ -69,10 +69,10 @@ int test_image_normalize()
 	std::unique_ptr<float[]> dst1(new float[matSplit[0].cols * matSplit[0].rows * channels]);
 	std::unique_ptr<float[]> dst2(new float[matSplit[0].cols * matSplit[0].rows * channels]);
 
-	int ret = image_normalize_cpu(data.get(), dst1.get(), width, height, channels, &elapsed_time1);
+	int ret = layer_channel_normalize_cpu(data.get(), dst1.get(), width, height, channels, &elapsed_time1);
 	if (ret != 0) PRINT_ERROR_INFO(image_normalize_cpu);
 
-	ret = image_normalize_gpu(data.get(), dst2.get(), width, height, channels, &elapsed_time2);
+	ret = layer_channel_normalize_gpu(data.get(), dst2.get(), width, height, channels, &elapsed_time2);
 	if (ret != 0) PRINT_ERROR_INFO(image_normalize_gpu);
 
 	int count{ 0 }, num{ width * height * channels };
