@@ -4,6 +4,12 @@
 #include <cstdlib>
 #include <vector>
 
+int test_layer_prior_vbox();
+int layer_prior_vbox_cpu(float* dst, int length, const std::vector<float>& vec1, const std::vector<float>& vec2,
+	const std::vector<float>& vec3, float* elapsed_time);
+int layer_prior_vbox_gpu(float* dst, int length, const std::vector<float>& vec1, const std::vector<float>& vec2,
+	const std::vector<float>& vec3, float* elapsed_time);
+
 int test_layer_reverse();
 int layer_reverse_cpu(const float* src, float* dst, int length, const std::vector<int>& vec, float* elapsed_time);
 int layer_reverse_gpu(const float* src, float* dst, int length, const std::vector<int>& vec, float* elapsed_time);

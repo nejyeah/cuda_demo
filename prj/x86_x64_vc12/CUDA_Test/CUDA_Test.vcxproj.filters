@@ -68,6 +68,9 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\layer_reverse.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\demo\CUDA_Test\layer_prior_vbox.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\vector_add.cu">
@@ -110,6 +113,9 @@
       <Filter>源文件</Filter>
     </CudaCompile>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\layer_reverse.cu">
+      <Filter>源文件</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\layer_prior_vbox.cu">
       <Filter>源文件</Filter>
     </CudaCompile>
   </ItemGroup>

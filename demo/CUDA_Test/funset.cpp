@@ -7,6 +7,33 @@
 #include <algorithm>
 #include "common.hpp"
 
+int test_layer_prior_vbox()
+{
+	std::vector<float> vec1{423.f, 245.f, 1333.f, 1444.f, 123.f, 23.f, 32.f, 66.f};
+	std::vector<float> vec2(vec1[6]);
+	std::vector<float> vec3(4);
+	int length = int(vec1[0] * vec1[1] * vec1[6] * 4 * 2);
+
+	std::unique_ptr<float[]> data1(new float[length]), data2(new float[length]);
+	std::for_each(data1.get(), data1.get() + length, [](float& n) {n = 0.f; });
+	std::for_each(data2.get(), data2.get() + length, [](float& n) {n = 0.f; });
+	generator_random_number(vec2.data(), vec2.size(), 10.f, 100.f);
+	generator_random_number(vec3.data(), vec3.size(), 1.f, 10.f);
+
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+	int ret = layer_prior_vbox_cpu(data1.get(), length, vec1, vec2, vec3, &elapsed_time1);
+	if (ret != 0) PRINT_ERROR_INFO(layer_prior_vbox_cpu);
+
+	ret = layer_prior_vbox_gpu(data2.get(), length, vec1, vec2, vec3, &elapsed_time2);
+	if (ret != 0) PRINT_ERROR_INFO(layer_prior_vbox_gpu);
+
+	compare_result(data1.get(), data2.get(), length);
+
+	fprintf(stderr, "test layer prior vbox: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	return 0;
+}
+
 int test_layer_reverse()
 {
 	std::string image_name{ "E:/GitCode/CUDA_Test/test_images/lena.png" };
@@ -39,7 +66,7 @@ int test_layer_reverse()
 
 	save_image(matSrc, matDst, 400, 200, "E:/GitCode/CUDA_Test/test_images/image_reverse.png");
 
-	fprintf(stderr, "test image reverse: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+	fprintf(stderr, "test layer reverse: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
 
 	return 0;
 }
@@ -95,7 +122,7 @@ int test_layer_channel_normalize()
 	//cv::resize(matSrc, matSrc, cv::Size(width, height));
 	//cv::imwrite("E:/GitCode/CUDA_Test/test_images/image_src.png", matSrc);
 
-	fprintf(stderr, "test image normalize: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+	fprintf(stderr, "test layer channel normalize: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
 
 	return 0;
 }

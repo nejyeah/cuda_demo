@@ -31,6 +31,7 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\julia.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\layer_channel_normalize.cpp" />
+    <ClCompile Include="..\..\..\demo\CUDA_Test\layer_prior_vbox.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\layer_reverse.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\long_vector_add.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\matrix_mul.cpp" />
@@ -47,6 +48,7 @@
     <CudaCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\julia.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\layer_channel_normalize.cu" />
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\layer_prior_vbox.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\layer_reverse.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\long_vector_add.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\matrix_mul.cu" />

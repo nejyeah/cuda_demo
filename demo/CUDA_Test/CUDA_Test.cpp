@@ -4,7 +4,7 @@
 
 int main()
 {
-	int ret = test_layer_reverse();
+	int ret = test_layer_prior_vbox();
 
 	if (ret == 0) fprintf(stderr, "***** test success *****\n");
 	else fprintf(stderr, "===== test fail =====\n");
