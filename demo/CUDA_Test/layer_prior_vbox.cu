@@ -60,11 +60,10 @@ __global__ static void layer_prior_vbox(float* dst, int layer_width, int layer_h
 int layer_prior_vbox_gpu(float* dst, int length, const std::vector<float>& vec1, const std::vector<float>& vec2,
 	const std::vector<float>& vec3, float* elapsed_time)
 {
-	float *dev_dst{ nullptr }, *dev_vec2{ nullptr }, *dev_vec3{ nullptr };
+	float *dev_dst{ nullptr }, *dev_vec;
 	// cudaMalloc: 在设备端分配内存
 	cudaMalloc(&dev_dst, length * sizeof(float));
-	cudaMalloc(&dev_vec2, vec2.size() * sizeof(float));
-	cudaMalloc(&dev_vec3, vec3.size() * sizeof(float));
+	cudaMalloc(&dev_vec, (vec2.size()+vec3.size()) * sizeof(float));
 	/* cudaMemcpy: 在主机端和设备端拷贝数据,此函数第四个参数仅能是下面之一:
 	(1). cudaMemcpyHostToHost: 拷贝数据从主机端到主机端
 	(2). cudaMemcpyHostToDevice: 拷贝数据从主机端到设备端
@@ -74,8 +73,8 @@ int layer_prior_vbox_gpu(float* dst, int length, const std::vector<float>& vec1,
 	统一虚拟寻址(CUDA6.0及以上版本)
 	cudaMemcpy函数对于主机是同步的 */
 	cudaMemcpy(dev_dst, dst, length * sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_vec2, vec2.data(), vec2.size() * sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_vec3, vec3.data(), vec3.size() * sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_vec, vec2.data(), vec2.size() * sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_vec + vec2.size(), vec3.data(), vec3.size() * sizeof(float), cudaMemcpyHostToDevice);
 
 	int layer_width = (int)vec1[0];
 	int layer_height = (int)vec1[1];
@@ -113,7 +112,7 @@ int layer_prior_vbox_gpu(float* dst, int length, const std::vector<float>& vec1,
 	cudaStream_t类型,用于设置与内核函数关联的流.S是一个可选参数,默认值0. */
 	// Note: 核函数不支持传入参数为vector的data()指针，需要cudaMalloc和cudaMemcpy，因为vector是在主机内存中
 	layer_prior_vbox << <blocks, threads>> >(dev_dst, layer_width, layer_height, image_width, image_height,
-		offset, step, num_priors, width, dev_vec2, dev_vec3, channel_size);
+		offset, step, num_priors, width, dev_vec, dev_vec + vec2.size(), channel_size);
 
 	/* cudaDeviceSynchronize: kernel的启动是异步的, 为了定位它是否出错, 一
 	般需要加上cudaDeviceSynchronize函数进行同步; 将会一直处于阻塞状态,直到
@@ -129,8 +128,7 @@ int layer_prior_vbox_gpu(float* dst, int length, const std::vector<float>& vec1,
 
 	// cudaFree: 释放设备上由cudaMalloc函数分配的内存
 	cudaFree(dev_dst);
-	cudaFree(dev_vec2);
-	cudaFree(dev_vec3);
+	cudaFree(dev_vec);
 
 	return 0;
 }
