@@ -1,5 +1,5 @@
 在Linux下通过CMake编译CUDA_Test中的测试代码步骤：
-1. 将终端定位到CUDA_Test/prj/linux_cmake，依次执行如下命令：
+1. 将终端定位到CUDA_Test/prj/linux_cuda_cmake，依次执行如下命令：
 	$ mkdir build
 	$ cd build
 	$ cmake ..
