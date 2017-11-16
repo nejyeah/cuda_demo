@@ -1,94 +1,32 @@
-#include <assert.h>
-#include <fstream>
-#include <sstream>
 #include <iostream>
-#include <cmath>
-#include <algorithm>
-#include <sys/stat.h>
-#include <time.h>
+#include <string>
+#include <tuple>
+
 #include <cuda_runtime_api.h>
+#include <NvInfer.h>
+#include <NvCaffeParser.h>
+#include <opencv2/opencv.hpp>
 
-#include "NvInfer.h"
-#include "NvCaffeParser.h"
+#include "common.hpp"
 
-using namespace nvinfer1;
-using namespace nvcaffeparser1;
+// reference: TensorRT-2.1.2/samples/sampleMNIST/sampleMNIST.cpp
 
-#define CHECK(status)									\
-{														\
-	if (status != 0)									\
-	{													\
-		std::cout << "Cuda failure: " << status;		\
-		abort();										\
-	}													\
-}
+typedef std::tuple<int, int, int, std::string, std::string> DATA_INFO; // intput width, input height, output size, input blob name, output blob name
 
-// stuff we know about the network and the caffe input/output blobs
-static const int INPUT_H = 28;
-static const int INPUT_W = 28;
-static const int OUTPUT_SIZE = 10;
-
-const char* INPUT_BLOB_NAME = "data";
-const char* OUTPUT_BLOB_NAME = "prob";
-
-// Logger for GIE info/warning/errors
-class Logger : public ILogger			
-{
-	void log(Severity severity, const char* msg) override
-	{
-		// suppress info-level messages
-		if (severity != Severity::kINFO)
-			std::cout << msg << std::endl;
-	}
-} gLogger;
-
-
-std::string locateFile(const std::string& input)
-{
-	std::string file = "data/samples/mnist/" + input;
-	struct stat info;
-	int i, MAX_DEPTH = 10;
-	for (i = 0; i < MAX_DEPTH && stat(file.c_str(), &info); i++)
-		file = "../" + file;
-
-    if (i == MAX_DEPTH)
-    {
-		file = std::string("data/mnist/") + input;
-		for (i = 0; i < MAX_DEPTH && stat(file.c_str(), &info); i++)
-			file = "../" + file;		
-    }
-
-	assert(i != MAX_DEPTH);
-
-	return file;
-}
-
-// simple PGM (portable greyscale map) reader
-void readPGMFile(const std::string& fileName,  uint8_t buffer[INPUT_H*INPUT_W])
-{
-	std::ifstream infile(locateFile(fileName), std::ifstream::binary);
-	std::string magic, h, w, max;
-	infile >> magic >> h >> w >> max;
-	infile.seekg(1, infile.cur);
-	infile.read(reinterpret_cast<char*>(buffer), INPUT_H*INPUT_W);
-}
-
-void caffeToGIEModel(const std::string& deployFile,				// name for caffe prototxt
-					 const std::string& modelFile,				// name for model 
-					 const std::vector<std::string>& outputs,   // network outputs
-					 unsigned int maxBatchSize,					// batch size - NB must be at least as large as the batch we want to run with)
-					 IHostMemory *&gieModelStream)    // output buffer for the GIE model
+static int caffeToGIEModel(const std::string& deployFile,	// name for caffe prototxt
+					 const std::string& modelFile,	// name for model 
+					 const std::vector<std::string>& outputs, // network outputs
+					 unsigned int maxBatchSize,	// batch size - NB must be at least as large as the batch we want to run with)
+					 nvinfer1::IHostMemory *&gieModelStream, // output buffer for the GIE model
+					 Logger logger) 
 {
 	// create the builder
-	IBuilder* builder = createInferBuilder(gLogger);
+	nvinfer1::IBuilder* builder = nvinfer1::createInferBuilder(logger);
 
 	// parse the caffe model to populate the network, then set the outputs
-	INetworkDefinition* network = builder->createNetwork();
-	ICaffeParser* parser = createCaffeParser();
-	const IBlobNameToTensor* blobNameToTensor = parser->parse(locateFile(deployFile).c_str(),
-															  locateFile(modelFile).c_str(),
-															  *network,
-															  DataType::kFLOAT);
+	nvinfer1::INetworkDefinition* network = builder->createNetwork();
+	nvcaffeparser1::ICaffeParser* parser = nvcaffeparser1::createCaffeParser();
+	const nvcaffeparser1::IBlobNameToTensor* blobNameToTensor = parser->parse(deployFile.c_str(), modelFile.c_str(), *network, nvinfer1::DataType::kFLOAT);
 
 	// specify which tensors are outputs
 	for (auto& s : outputs)
@@ -98,8 +36,8 @@ void caffeToGIEModel(const std::string& deployFile,				// name for caffe prototx
 	builder->setMaxBatchSize(maxBatchSize);
 	builder->setMaxWorkspaceSize(1 << 20);
 
-	ICudaEngine* engine = builder->buildCudaEngine(*network);
-	assert(engine);
+	nvinfer1::ICudaEngine* engine = builder->buildCudaEngine(*network);
+	CHECK(engine != nullptr);
 
 	// we don't need the network any more, and we can destroy the parser
 	network->destroy();
@@ -109,99 +47,112 @@ void caffeToGIEModel(const std::string& deployFile,				// name for caffe prototx
 	gieModelStream = engine->serialize();
 	engine->destroy();
 	builder->destroy();
-	shutdownProtobufLibrary();
+	nvcaffeparser1::shutdownProtobufLibrary(); ///// Note
+
+	return 0;
 }
 
-void doInference(IExecutionContext& context, float* input, float* output, int batchSize)
+static int doInference(nvinfer1::IExecutionContext& context, const float* input, float* output, int batchSize, const DATA_INFO& info)
 {
-	const ICudaEngine& engine = context.getEngine();
+	const nvinfer1::ICudaEngine& engine = context.getEngine();
 	// input and output buffer pointers that we pass to the engine - the engine requires exactly IEngine::getNbBindings(),
 	// of these, but in this case we know that there is exactly one input and one output.
-	assert(engine.getNbBindings() == 2);
+	CHECK(engine.getNbBindings() == 2);
 	void* buffers[2];
 
 	// In order to bind the buffers, we need to know the names of the input and output tensors.
 	// note that indices are guaranteed to be less than IEngine::getNbBindings()
-	int inputIndex = engine.getBindingIndex(INPUT_BLOB_NAME), 
-		outputIndex = engine.getBindingIndex(OUTPUT_BLOB_NAME);
+	int inputIndex = engine.getBindingIndex(std::get<3>(info).c_str()), 
+		outputIndex = engine.getBindingIndex(std::get<4>(info).c_str());
 
 	// create GPU buffers and a stream
-	CHECK(cudaMalloc(&buffers[inputIndex], batchSize * INPUT_H * INPUT_W * sizeof(float)));
-	CHECK(cudaMalloc(&buffers[outputIndex], batchSize * OUTPUT_SIZE * sizeof(float)));
+	checkCudaErrors(cudaMalloc(&buffers[inputIndex], batchSize * std::get<1>(info) * std::get<0>(info) * sizeof(float)));
+	checkCudaErrors(cudaMalloc(&buffers[outputIndex], batchSize * std::get<2>(info) * sizeof(float)));
 
 	cudaStream_t stream;
-	CHECK(cudaStreamCreate(&stream));
+	checkCudaErrors(cudaStreamCreate(&stream));
 
 	// DMA the input to the GPU,  execute the batch asynchronously, and DMA it back:
-	CHECK(cudaMemcpyAsync(buffers[inputIndex], input, batchSize * INPUT_H * INPUT_W * sizeof(float), cudaMemcpyHostToDevice, stream));
+	checkCudaErrors(cudaMemcpyAsync(buffers[inputIndex], input, batchSize * std::get<1>(info) * std::get<0>(info) * sizeof(float), cudaMemcpyHostToDevice, stream));
 	context.enqueue(batchSize, buffers, stream, nullptr);
-	CHECK(cudaMemcpyAsync(output, buffers[outputIndex], batchSize * OUTPUT_SIZE*sizeof(float), cudaMemcpyDeviceToHost, stream));
+	checkCudaErrors(cudaMemcpyAsync(output, buffers[outputIndex], batchSize * std::get<2>(info) * sizeof(float), cudaMemcpyDeviceToHost, stream));
 	cudaStreamSynchronize(stream);
 
 	// release the stream and the buffers
 	cudaStreamDestroy(stream);
-	CHECK(cudaFree(buffers[inputIndex]));
-	CHECK(cudaFree(buffers[outputIndex]));
-}
+	checkCudaErrors(cudaFree(buffers[inputIndex]));
+	checkCudaErrors(cudaFree(buffers[outputIndex]));
 
+	return 0;
+}
 
 int test_mnist()
 {
+	// stuff we know about the network and the caffe input/output blobs
+	const DATA_INFO info(28, 28, 10, "data", "prob");
+	const std::string deploy_file {"models/mnist.prototxt"};
+	const std::string model_file {"models/mnist.caffemodel"};
+	const std::string mean_file {"models/mnist_mean.binaryproto"};
+	const std::vector<std::string> output_blobs_name{std::get<4>(info)};
+	Logger logger; // multiple instances of IRuntime and/or IBuilder must all use the same logger
+
 	// create a GIE model from the caffe model and serialize it to a stream
-    IHostMemory *gieModelStream{nullptr};
-   	caffeToGIEModel("mnist.prototxt", "mnist.caffemodel", std::vector < std::string > { OUTPUT_BLOB_NAME }, 1, gieModelStream);
-
-	// read a random digit file
-	srand(unsigned(time(nullptr)));
-	uint8_t fileData[INPUT_H*INPUT_W];
-    int num = rand() % 10;
-	readPGMFile(std::to_string(num) + ".pgm", fileData);
-
-	// print an ascii representation
-	std::cout << "\n\n\n---------------------------" << "\n\n\n" << std::endl;
-	for (int i = 0; i < INPUT_H*INPUT_W; i++)
-		std::cout << (" .:-=+*#%@"[fileData[i] / 26]) << (((i + 1) % INPUT_W) ? "" : "\n");
+    nvinfer1::IHostMemory* gieModelStream{ nullptr };
+   	caffeToGIEModel(deploy_file, model_file, output_blobs_name, 1, gieModelStream, logger);
 
 	// parse the mean file and 	subtract it from the image
-	ICaffeParser* parser = createCaffeParser();
-	IBinaryProtoBlob* meanBlob = parser->parseBinaryProto(locateFile("mnist_mean.binaryproto").c_str());
+	nvcaffeparser1::ICaffeParser* parser = nvcaffeparser1::createCaffeParser();
+	nvcaffeparser1::IBinaryProtoBlob* meanBlob = parser->parseBinaryProto(mean_file.c_str());
 	parser->destroy();
 
-	const float *meanData = reinterpret_cast<const float*>(meanBlob->getData());
+	// deserialize the engine 
+	nvinfer1::IRuntime* runtime = nvinfer1::createInferRuntime(logger);
+	nvinfer1::ICudaEngine* engine = runtime->deserializeCudaEngine(gieModelStream->data(), gieModelStream->size(), nullptr);
+	nvinfer1::IExecutionContext* context = engine->createExecutionContext();
 
-	float data[INPUT_H*INPUT_W];
-	for (int i = 0; i < INPUT_H*INPUT_W; i++)
-		data[i] = float(fileData[i])-meanData[i];
+	const float* meanData = reinterpret_cast<const float*>(meanBlob->getData());
+
+	const std::string image_path{ "images/digit/" };
+	for (int i = 0; i < 10; ++i) {
+		const std::string image_name = image_path + std::to_string(i) + ".png";
+		cv::Mat mat = cv::imread(image_name, 0);
+		if (!mat.data) {
+			fprintf(stderr, "read image fail: %s\n", image_name.c_str());
+			return -1;
+		}
+
+		cv::resize(mat, mat, cv::Size(std::get<0>(info), std::get<1>(info)));
+		mat.convertTo(mat, CV_32FC1);
+
+		float data[std::get<1>(info)*std::get<0>(info)];
+		const float* p = (float*)mat.data;
+		for (int j = 0; j < std::get<1>(info)*std::get<0>(info); ++j) {
+			data[j] = p[j] - meanData[j];
+		}
+
+		// run inference
+		float prob[std::get<2>(info)];
+		doInference(*context, data, prob, 1, info);
+
+		float val{-1.f};
+		int idx{-1};
+
+		for (int t = 0; t < std::get<2>(info); ++t) {
+			if (val < prob[t]) {
+				val = prob[t];
+				idx = t;
+			}
+		}
+
+		fprintf(stdout, "expected value: %d, actual value: %d, probability: %f\n", i, idx, val);
+	}
 
 	meanBlob->destroy();
-
-	// deserialize the engine 
-	IRuntime* runtime = createInferRuntime(gLogger);
-	ICudaEngine* engine = runtime->deserializeCudaEngine(gieModelStream->data(), gieModelStream->size(), nullptr);
-    if (gieModelStream) gieModelStream->destroy();
-
-	IExecutionContext *context = engine->createExecutionContext();
-
-	// run inference
-	float prob[OUTPUT_SIZE];
-	doInference(*context, data, prob, 1);
-
+	if (gieModelStream) gieModelStream->destroy();
 	// destroy the engine
 	context->destroy();
 	engine->destroy();
 	runtime->destroy();
 
-	// print a histogram of the output distribution
-	std::cout << "\n\n";
-    float val{0.0f};
-    int idx{0};
-	for (unsigned int i = 0; i < 10; i++)
-    {
-        val = std::max(val, prob[i]);
-        if (val == prob[i]) idx = i;
-		std::cout << i << ": " << std::string(int(std::floor(prob[i] * 10 + 0.5f)), '*') << "\n";
-    }
-	std::cout << std::endl;
-
-	return (idx == num && val > 0.9f) ? EXIT_SUCCESS : EXIT_FAILURE;
+	return 0;
 }

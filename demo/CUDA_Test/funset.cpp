@@ -36,7 +36,7 @@ int test_layer_prior_vbox()
 
 int test_layer_reverse()
 {
-	std::string image_name{ "E:/GitCode/CUDA_Test/test_images/lena.png" };
+	std::string image_name{ "E:/GitCode/CUDA_Test/test_data/images/lena.png" };
 	cv::Mat matSrc = cv::imread(image_name);
 	CHECK(matSrc.data);
 
@@ -64,7 +64,7 @@ int test_layer_reverse()
 	cv::Mat matTmp2(height, width, CV_32FC1, dst2.get()), matDst;
 	matTmp2.convertTo(matDst, CV_8UC1);
 
-	save_image(matSrc, matDst, 400, 200, "E:/GitCode/CUDA_Test/test_images/image_reverse.png");
+	save_image(matSrc, matDst, 400, 200, "E:/GitCode/CUDA_Test/test_data/images/image_reverse.png");
 
 	fprintf(stderr, "test layer reverse: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
 
@@ -73,7 +73,7 @@ int test_layer_reverse()
 
 int test_layer_channel_normalize()
 {
-	std::string image_name{ "E:/GitCode/CUDA_Test/test_images/lena.png" };
+	std::string image_name{ "E:/GitCode/CUDA_Test/test_data/images/lena.png" };
 	cv::Mat matSrc = cv::imread(image_name);
 	if (!matSrc.data) {
 		fprintf(stderr, "read image fail: %s\n", image_name.c_str());
@@ -118,9 +118,9 @@ int test_layer_channel_normalize()
 	cv::Mat dst3;
 	cv::merge(merge, dst3);
 	dst3.convertTo(dst3, CV_8UC3, 255.f);
-	cv::imwrite("E:/GitCode/CUDA_Test/test_images/image_normalize.png", dst3);
+	cv::imwrite("E:/GitCode/CUDA_Test/test_data/images/image_normalize.png", dst3);
 	//cv::resize(matSrc, matSrc, cv::Size(width, height));
-	//cv::imwrite("E:/GitCode/CUDA_Test/test_images/image_src.png", matSrc);
+	//cv::imwrite("E:/GitCode/CUDA_Test/test_data/images/image_src.png", matSrc);
 
 	fprintf(stderr, "test layer channel normalize: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
 
