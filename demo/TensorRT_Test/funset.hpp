@@ -2,5 +2,6 @@
 #define FBC_TENSORRT_TEST_FUNSET_HPP_
 
 int test_mnist();
+int test_mnist_api();
 
 #endif // FBC_TENSORRT_TEST_FUNSET_HPP_

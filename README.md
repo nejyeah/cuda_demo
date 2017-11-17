@@ -1,6 +1,6 @@
 # CUDA_Test
 **The main role of the project: CUDA 8.0/TensorRT's usage(each test code gives the implementation of C ++ and CUDA, respectively, and gives the calculation time for each method):**
-- CUDA test code
+- CUDA 8.0 test code
 	- simple
 		- vector add: C = A + B
 		- matrix multiplication: C = A * B
@@ -16,8 +16,9 @@
 		- channel normalize(mean/standard deviation)
 		- reverse
 		- prior_vbox
-- TensorRT test code
+- TensorRT 2.1.2 test code
 	- MNIST
+	- MNIST API
 
 **The project support platform:**
 - windows10 64 bits: It can be directly build with VS2013 in windows10 64bits.
