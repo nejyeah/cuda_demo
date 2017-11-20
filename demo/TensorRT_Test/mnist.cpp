@@ -10,6 +10,7 @@
 #include "common.hpp"
 
 // reference: TensorRT-2.1.2/samples/sampleMNIST/sampleMNIST.cpp
+// demonstrates a typical build and execution phase using a Caffe model that is trained on the MNIST dataset
 
 typedef std::tuple<int, int, int, std::string, std::string> DATA_INFO; // intput width, input height, output size, input blob name, output blob name
 
