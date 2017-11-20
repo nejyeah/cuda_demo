@@ -6,5 +6,8 @@
 *.opensdf
 *.pdb
 *.jpg
+prj/linux_tensorrt_cmake/build/
+prj/linux_cuda_cmake/build/
+.vscode/
 
 

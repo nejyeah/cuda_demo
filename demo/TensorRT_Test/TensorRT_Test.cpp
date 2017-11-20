@@ -4,7 +4,7 @@
 
 int main()
 {
-	int ret = test_mnist_api();
+	int ret = test_googlenet();
 
 	if (ret == 0) fprintf(stdout, "========== test success ==========\n");
 	else fprintf(stderr, "########## test fail ##########\n");
