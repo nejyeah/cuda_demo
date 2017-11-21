@@ -18,10 +18,11 @@
 		- prior_vbox
 - TensorRT 2.1.2 test code
 	- MNIST
-	- MNIST API
+	- MNIST API(use api produce network)
 	- GoogleNet
 	- CharRNN
-	- Plugin
+	- Plugin(add a custom layer)
+	- MNIST Infer(serialize TensorRT model)
 
 **The project support platform:**
 - windows10 64 bits: It can be directly build with VS2013 in windows10 64bits.
