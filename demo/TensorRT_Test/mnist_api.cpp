@@ -11,7 +11,7 @@
 
 #include "common.hpp"
 
-// reference: TensorRT-2.1.2/samples/sampleMNIST/sampleMNISTAPI.cpp
+// reference: TensorRT-2.1.2/samples/sampleMNISTAPI/sampleMNISTAPI.cpp
 // demonstrates how to use the API in order to produce the same network as SampleMNIST but without using NvCaffeParser
 
 // intput width, input height, output size, input blob name, output blob name, weight file, mean file

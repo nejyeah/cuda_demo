@@ -15,7 +15,7 @@
 
 #include "common.hpp"
 
-// reference: TensorRT-2.1.2/samples/sampleMNIST/sampleCharRNN.cpp
+// reference: TensorRT-2.1.2/samples/sampleCharRNN/sampleCharRNN.cpp
 // demonstrates how to generate a simple RNN based on the charRNN network using the PTB dataset
 
 namespace {

@@ -42,6 +42,8 @@ INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 LINK_DIRECTORIES(/usr/local/tensorrt/tensorrt2.1_v6.0/lib)
 # 指定cudnn动态库搜索路径
 LINK_DIRECTORIES(/usr/local/cudnn/cudnn8.0_v6.0/lib64)
+# 指定cuda动态库搜索路径
+LINK_DIRECTORIES(/usr/local/cuda-8.0/lib64)
 
 # 使CUDA NVCC 编译器支持C++11特性
 LIST(APPEND CUDA_NVCC_FLAGS -std=c++11;-O2)
@@ -56,7 +58,7 @@ LIST(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_60,code=sm_60)
 #ADD_EXECUTABLE(TensorRT_Test ${CPP_LIST} ${CU_LIST}) # 不包括编译*.cu文件，需要使用CUDA_ADD_EXECUTABLE命令
 CUDA_ADD_EXECUTABLE(TensorRT_Test ${CPP_LIST} ${CU_LIST})
 # 用来为target添加需要链接的共享库，指定工程所用的依赖库，包括动态库和静态库
-TARGET_LINK_LIBRARIES(TensorRT_Test ${OpenCV_LIBS} nvcaffe_parser nvinfer cudnn)
+TARGET_LINK_LIBRARIES(TensorRT_Test ${OpenCV_LIBS} nvcaffe_parser nvinfer cudnn cublas)
 #MESSAGE(STATUS "opencv libs: ${OpenCV_LIBS}")
 
 MESSAGE(STATUS "**************************************")
