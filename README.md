@@ -16,6 +16,8 @@
 		- channel normalize(mean/standard deviation)
 		- reverse
 		- prior_vbox
+	- image process
+		- bgr to gray
 - TensorRT 2.1.2 test code
 	- MNIST
 	- MNIST API(use api produce network)
