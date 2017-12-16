@@ -7,6 +7,33 @@
 #include <algorithm>
 #include "common.hpp"
 
+int test_image_process_bgr2gray()
+{
+	const std::string image_name{ "E:/GitCode/CUDA_Test/test_data/images/lena.png" };
+	cv::Mat mat = cv::imread(image_name);
+	CHECK(mat.data);
+
+	const int width{ 1513 }, height{ 1473 };
+	cv::resize(mat, mat, cv::Size(width, height));
+
+	std::unique_ptr<unsigned char[]> data1(new unsigned char[width * height]), data2(new unsigned char[width * height]);
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+
+	CHECK(bgr2gray_cpu(mat.data, width, height, data1.get(), &elapsed_time1) == 0);
+	CHECK(bgr2gray_gpu(mat.data, width, height, data2.get(), &elapsed_time2) == 0);
+
+	cv::Mat dst(height, width, CV_8UC1, data1.get());
+	cv::imwrite("E:/GitCode/CUDA_Test/test_data/images/bgr2gray_cpu.png", dst);
+	cv::Mat dst2(height, width, CV_8UC1, data2.get());
+	cv::imwrite("E:/GitCode/CUDA_Test/test_data/images/bgr2gray_gpu.png", dst2);
+
+	fprintf(stdout, "image bgr to gray: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	CHECK(compare_result(data1.get(), data2.get(), width*height) == 0);
+
+	return 0;
+}
+
 int test_layer_prior_vbox()
 {
 	std::vector<float> vec1{423.f, 245.f, 1333.f, 1444.f, 123.f, 23.f, 32.f, 66.f};

@@ -4,7 +4,7 @@
 
 int main()
 {
-	int ret = test_layer_prior_vbox();
+	int ret = test_image_process_bgr2gray();
 
 	if (ret == 0) fprintf(stderr, "***** test success *****\n");
 	else fprintf(stderr, "===== test fail =====\n");
