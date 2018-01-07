@@ -77,6 +77,9 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\common.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\demo\CUDA_Test\bgr2bgr565.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\vector_add.cu">
@@ -125,6 +128,9 @@
       <Filter>源文件</Filter>
     </CudaCompile>
     <CudaCompile Include="..\..\..\demo\CUDA_Test\bgr2gray.cu">
+      <Filter>源文件</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\bgr2bgr565.cu">
       <Filter>源文件</Filter>
     </CudaCompile>
   </ItemGroup>

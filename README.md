@@ -18,6 +18,7 @@
 		- prior_vbox
 	- image process
 		- bgr to gray
+		- bgr to bgr565
 - TensorRT 2.1.2 test code
 	- MNIST
 	- MNIST API(use api produce network)

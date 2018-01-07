@@ -4,6 +4,10 @@
 #include <cstdlib>
 #include <vector>
 
+int test_image_process_bgr2bgr565();
+int bgr2bgr565_cpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);
+int bgr2bgr565_gpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);
+
 int test_image_process_bgr2gray();
 int bgr2gray_cpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);
 int bgr2gray_gpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);

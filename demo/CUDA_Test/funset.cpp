@@ -7,6 +7,32 @@
 #include <algorithm>
 #include "common.hpp"
 
+int test_image_process_bgr2bgr565()
+{
+	const std::string image_name{ "E:/GitCode/CUDA_Test/test_data/images/lena.png" };
+	cv::Mat mat = cv::imread(image_name, 1);
+	CHECK(mat.data);
+
+	const int width{ 1513 }, height{ 1473 };
+	cv::resize(mat, mat, cv::Size(width, height));
+
+	std::unique_ptr<unsigned char[]> data1(new unsigned char[width * height * 2]), data2(new unsigned char[width * height * 2]);
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+
+	cv::Mat bgr565;
+	cv::cvtColor(mat, bgr565, cv::COLOR_BGR2BGR565);
+
+	CHECK(bgr2bgr565_cpu(mat.data, width, height, data1.get(), &elapsed_time1) == 0);
+	CHECK(bgr2bgr565_gpu(mat.data, width, height, data2.get(), &elapsed_time2) == 0);
+
+	fprintf(stdout, "image bgr to bgr565: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	CHECK(compare_result(data1.get(), bgr565.data, width*height * 2) == 0);
+	CHECK(compare_result(data1.get(), data2.get(), width*height*2) == 0);
+
+	return 0;
+}
+
 int test_image_process_bgr2gray()
 {
 	const std::string image_name{ "E:/GitCode/CUDA_Test/test_data/images/lena.png" };

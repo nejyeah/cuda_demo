@@ -16,8 +16,8 @@
 	fprintf(stderr, "Error: %s, file: %s, func: %s, line: %d\n", #info, __FILE__, __FUNCTION__, __LINE__); \
 	return -1; }
 
-#define TIME_START_CPU auto start = std::chrono::steady_clock::now();
-#define TIME_END_CPU auto end = std::chrono::steady_clock::now(); \
+#define TIME_START_CPU auto start = std::chrono::high_resolution_clock::now();
+#define TIME_END_CPU auto end = std::chrono::high_resolution_clock::now(); \
 	auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start); \
 	*elapsed_time = duration.count() * 1.0e-6;
 
