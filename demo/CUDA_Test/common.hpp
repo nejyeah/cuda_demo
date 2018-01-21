@@ -1,5 +1,6 @@
 #ifndef FBC_CUDA_TEST_COMMON_HPP_
 #define FBC_CUDA_TEST_COMMON_HPP_
+
 #include <cuda_runtime.h> // For the CUDA runtime routines (prefixed with "cuda_")
 #include <device_launch_parameters.h>
 #include <opencv2/opencv.hpp>
@@ -43,6 +44,8 @@ void generator_random_number(float* data, int length, float a = 0.f, float b = 1
 template<typename T> void generator_random_number(T* data, int length, T a = (T)0, T b = (T)1);
 int save_image(const cv::Mat& mat1, const cv::Mat& mat2, int width, int height, const std::string& name);
 template<typename T> int compare_result(const T* src1, const T* src2, int length);
+template<typename T> int read_file(const std::string& name, int length, T* data, int mode = 0); // mode = 0: txt; mode = 1: binary
+template<typename T> int write_file(const std::string& name, int length, const T* data, int mode = 0); // mode = 0: txt; mode = 1: binary
 
 
 #endif // FBC_CUDA_TEST_COMMON_HPP_

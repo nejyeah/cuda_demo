@@ -1,5 +1,6 @@
 #include "common.hpp"
 #include<random>
+#include <fstream>
 #include <typeinfo>
 
 #include <cuda_runtime.h> // For the CUDA runtime routines (prefixed with "cuda_")
@@ -90,12 +91,88 @@ int compare_result(const T* src1, const T* src2, int length)
 	return 0;
 }
 
+template<typename T> // mode = 0: txt; mode = 1: binary
+int read_file(const std::string& name, int length, T* data, int mode)
+{
+	if (mode == 0) {
+		std::ifstream fin(name.c_str(), std::ios::in);
+		if (!fin.is_open()) {
+			fprintf(stderr, "open file fail: %s\n", name.c_str());
+			return -1;
+		}
+
+		T* p = data;
+		for (int i = 0; i < length; ++i) {
+			fin >> p[i];
+		}
+
+		fin.close();
+	} else {
+		std::ifstream fin(name.c_str(), std::ios::in | std::ios::binary);
+		if (!fin.is_open()) {
+			fprintf(stderr, "open file fail: %s\n", name.c_str());
+			return -1;
+		}
+
+		T* p = data;
+		fin.read((char*)p, sizeof(T)* length);
+
+		fin.close();
+	}
+
+	return 0;
+}
+
+template<typename T> // mode = 0: txt; mode = 1: binary
+int write_file(const std::string& name, int length, const T* data, int mode)
+{
+	if (mode == 0) {
+		std::ofstream fout(name.c_str(), std::ios::out);
+		if (!fout.is_open()) {
+			fprintf(stderr, "open file fail: %s\n", name.c_str());
+			return -1;
+		}
+
+		const T* p = data;
+		for (int i = 0; i < length; ++i) {
+			fout << p[i] << "  ";
+		}
+
+		fout.close();
+	}
+	else {
+		std::ofstream fout(name.c_str(), std::ios::out | std::ios::binary);
+		if (!fout.is_open()) {
+			fprintf(stderr, "open file fail: %s\n", name.c_str());
+			return -1;
+		}
+
+		const T* p = data;
+		fout.write((char*)p, sizeof(T)* length);
+
+		fout.close();
+	}
+
+	return 0;
+}
+
 ///////////////////////////////////////
 template int check<int>(int, const char * const, const char * const, const int);
 template int check_Cuda(int, const char * const, const char * const, const int);
+
 template void generator_random_number<unsigned char>(unsigned char*, int, unsigned char, unsigned char);
 template void generator_random_number<char>(char*, int, char, char);
 template void generator_random_number<int>(int*, int, int, int);
 template void generator_random_number<short>(short*, int, short, short);
+
 template int compare_result<float>(const float*, const float*, int);
 template int compare_result<unsigned char>(const unsigned char*, const unsigned char*, int);
+
+template int read_file<float>(const std::string& name, int, float*, int);
+template int read_file<int>(const std::string& name, int, int*, int);
+template int read_file<unsigned char>(const std::string& name, int, unsigned char*, int);
+
+template int write_file<float>(const std::string& name, int, const float*, int);
+template int write_file<int>(const std::string& name, int, const int*, int);
+template int write_file<unsigned char>(const std::string& name, int, const unsigned char*, int);
+

@@ -4,6 +4,10 @@
 #include <cstdlib>
 #include <vector>
 
+int test_image_process_histogram_equalization();
+int histogram_equalization_cpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);
+int histogram_equalization_gpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);
+
 int test_image_process_bgr2bgr565();
 int bgr2bgr565_cpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);
 int bgr2bgr565_gpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);

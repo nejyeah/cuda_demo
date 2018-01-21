@@ -32,6 +32,7 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\funset.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\green_ball.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cpp" />
+    <ClCompile Include="..\..\..\demo\CUDA_Test\histogram_equalization.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\julia.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\layer_channel_normalize.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\layer_prior_vbox.cpp" />
@@ -51,6 +52,7 @@
     <CudaCompile Include="..\..\..\demo\CUDA_Test\dot_product.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\green_ball.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cu" />
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\histogram_equalization.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\julia.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\layer_channel_normalize.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\layer_prior_vbox.cu" />
