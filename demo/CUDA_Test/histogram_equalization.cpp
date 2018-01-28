@@ -6,7 +6,7 @@
 
 int histogram_equalization_cpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time)
 {
-	TIME_START_CPU
+	//TIME_START_CPU
 
 	const int hist_sz{ 256 };
 	std::vector<int> hist(hist_sz, 0), lut(hist_sz, 0);
@@ -40,7 +40,7 @@ int histogram_equalization_cpu(const unsigned char* src, int width, int height, 
 		}
 	}
 
-	TIME_END_CPU
+	//TIME_END_CPU
 
 	return 0;
 }

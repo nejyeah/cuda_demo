@@ -13,9 +13,8 @@ int test_image_process_histogram_equalization()
 	cv::Mat mat = cv::imread(image_name, 0);
 	CHECK(mat.data);
 
-	//const int width{ 1513 }, height{ 1473 };
-	//cv::resize(mat, mat, cv::Size(width, height));
-	int width = mat.cols, height = mat.rows;
+	const int width{ mat.cols/*1513*/ }, height{ mat.rows/*1473*/ };
+	cv::resize(mat, mat, cv::Size(width, height));
 
 	std::unique_ptr<unsigned char[]> data1(new unsigned char[width * height]), data2(new unsigned char[width * height]);
 	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
@@ -23,7 +22,7 @@ int test_image_process_histogram_equalization()
 	CHECK(histogram_equalization_cpu(mat.data, width, height, data1.get(), &elapsed_time1) == 0);
 	//CHECK(histogram_equalization_gpu(mat.data, width, height, data2.get(), &elapsed_time2) == 0);
 
-	fprintf(stdout, "image histogram equalization: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+	//fprintf(stdout, "image histogram equalization: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
 
 	cv::Mat dst;
 	cv::equalizeHist(mat, dst);
@@ -31,6 +30,8 @@ int test_image_process_histogram_equalization()
 
 	CHECK(compare_result(data1.get(), dst.data, width*height) == 0);
 	//CHECK(compare_result(data1.get(), data2.get(), width*height) == 0);
+
+	save_image(mat, dst, width, height/2, "E:/GitCode/CUDA_Test/test_data/images/histogram_equalization_result.png");
 
 	return 0;
 }
