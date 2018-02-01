@@ -10,6 +10,8 @@
 
 #include "common.hpp"
 
+// Blog: http://blog.csdn.net/fengbingchun/article/details/78580652
+
 // reference: TensorRT-2.1.2/samples/sampleGoogleNet/sampleGoogleNet.cpp
 // demonstrates the layer-based profiling, and TensorRT’s half2 mode, which runs the network in 16-bit floating point precision
 

@@ -1,3 +1,4 @@
+# Blog: http://blog.csdn.net/fengbingchun/article/details/77193530
 # CMake file for CUDA_Test
 
 # 设定依赖的CMake版本

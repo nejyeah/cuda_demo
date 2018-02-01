@@ -13,6 +13,8 @@
 
 #include "common.hpp"
 
+// Blog: http://blog.csdn.net/fengbingchun/article/details/78589365
+
 // reference: TensorRT-2.1.2/samples/samplePlugin/samplePlugin.cpp
 // demonstrates how to add a custom layer to TensorRT. It replaces the final fully connected layer of the MNIST sample with a direct call to cuBLAS
 

@@ -9,6 +9,7 @@
 
 int test_image_process_histogram_equalization()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/79188021
 	const std::string image_name{ "E:/GitCode/CUDA_Test/test_data/images/lena.png" };
 	cv::Mat mat = cv::imread(image_name, 0);
 	CHECK(mat.data);
@@ -38,6 +39,7 @@ int test_image_process_histogram_equalization()
 
 int test_image_process_bgr2bgr565()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/78995720
 	const std::string image_name{ "E:/GitCode/CUDA_Test/test_data/images/lena.png" };
 	cv::Mat mat = cv::imread(image_name, 1);
 	CHECK(mat.data);
@@ -64,6 +66,7 @@ int test_image_process_bgr2bgr565()
 
 int test_image_process_bgr2gray()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/78821765
 	const std::string image_name{ "E:/GitCode/CUDA_Test/test_data/images/lena.png" };
 	cv::Mat mat = cv::imread(image_name);
 	CHECK(mat.data);
@@ -91,6 +94,7 @@ int test_image_process_bgr2gray()
 
 int test_layer_prior_vbox()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/77850422
 	std::vector<float> vec1{423.f, 245.f, 1333.f, 1444.f, 123.f, 23.f, 32.f, 66.f};
 	std::vector<float> vec2(vec1[6]);
 	std::vector<float> vec3(4);
@@ -118,6 +122,7 @@ int test_layer_prior_vbox()
 
 int test_layer_reverse()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/77160872
 	std::string image_name{ "E:/GitCode/CUDA_Test/test_data/images/lena.png" };
 	cv::Mat matSrc = cv::imread(image_name);
 	CHECK(matSrc.data);
@@ -155,6 +160,7 @@ int test_layer_reverse()
 
 int test_layer_channel_normalize()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/76976024
 	std::string image_name{ "E:/GitCode/CUDA_Test/test_data/images/lena.png" };
 	cv::Mat matSrc = cv::imread(image_name);
 	if (!matSrc.data) {
@@ -211,6 +217,7 @@ int test_layer_channel_normalize()
 
 int test_get_device_info()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/76902556
 	int ret = get_device_info();
 	if (ret != 0) PRINT_ERROR_INFO(get_device_info);
 
@@ -219,6 +226,7 @@ int test_get_device_info()
 
 int test_matrix_mul()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/76618165
 	// Matrix multiplication: C = A * B
 	// 矩阵A、B的宽、高应是32的整数倍
 	const int rowsA{ 352 }, colsA{ 672 }, rowsB = colsA, colsB{ 384 };
@@ -254,6 +262,8 @@ int test_matrix_mul()
 
 int test_dot_product()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/75669764
+	//       http://blog.csdn.net/fengbingchun/article/details/76571955
 	const int length{ 1024 * 1024 * 33 };
 	std::unique_ptr<float[]> A(new float[length]);
 	std::unique_ptr<float[]> B(new float[length]);
@@ -281,6 +291,7 @@ int test_dot_product()
 
 int test_streams()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/76532198
 	const int length{ 1024 * 1024 * 20};
 	std::unique_ptr<int[]> A(new int[length]);
 	std::unique_ptr<int[]> B(new int[length]);
@@ -315,6 +326,7 @@ int test_streams()
 
 int test_calculate_histogram()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/76417598
 	const int length{ 10 * 1024 * 1024 }; // 100MB
 	std::unique_ptr<unsigned char[]> data(new unsigned char[length]);
 	generator_random_number<unsigned char>(data.get(), length, 0, 255);
@@ -352,6 +364,7 @@ int test_calculate_histogram()
 
 int test_heat_conduction()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/76228257
 	const int width{ 1024 }, height = width;
 	cv::Mat mat1(height, width, CV_8UC4), mat2(height, width, CV_8UC4);
 
@@ -411,6 +424,7 @@ int test_heat_conduction()
 
 int test_ray_tracking()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/76135606
 	const int spheres{ 20 };
 	std::unique_ptr<float[]> A(new float[spheres * 3]);
 	std::unique_ptr<float[]> B(new float[spheres * 3]);
@@ -456,6 +470,7 @@ int test_ray_tracking()
 
 int test_green_ball()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/76058122
 	const int width{ 512 }, height = width;
 	cv::Mat mat1(height, width, CV_8UC4), mat2(height, width, CV_8UC4);
 
@@ -492,6 +507,7 @@ int test_green_ball()
 
 int test_ripple()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/76043190
 	const int width{ 512 }, height = width;
 	const int ticks{ 999 };
 	cv::Mat mat1(height, width, CV_8UC4), mat2(height, width, CV_8UC4);
@@ -529,6 +545,7 @@ int test_ripple()
 
 int test_julia()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/76020154
 	const int width{ 512 }, height = width;
 	const float scale{ 1.5f };
 	cv::Mat mat1(height, width, CV_8UC4), mat2(height, width, CV_8UC4);
@@ -566,6 +583,7 @@ int test_julia()
 
 int test_long_vector_add()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/75570546
 	const int length{ 100000000 };
 	std::unique_ptr<float[]> A(new float[length]);
 	std::unique_ptr<float[]> B(new float[length]);
@@ -599,6 +617,7 @@ int test_long_vector_add()
 
 int test_vector_add()
 {
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/74120057
 	// Vector addition: C = A + B, implements element by element vector addition
 	const int numElements{ 50000 };
 	std::vector<float> A(numElements), B(numElements), C1(numElements), C2(numElements);

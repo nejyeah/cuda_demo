@@ -15,6 +15,8 @@
 
 #include "common.hpp"
 
+// Blog: http://blog.csdn.net/fengbingchun/article/details/78584365
+
 // reference: TensorRT-2.1.2/samples/sampleCharRNN/sampleCharRNN.cpp
 // demonstrates how to generate a simple RNN based on the charRNN network using the PTB dataset
 

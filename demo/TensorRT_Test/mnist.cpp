@@ -9,6 +9,7 @@
 
 #include "common.hpp"
 
+// Blog: http://blog.csdn.net/fengbingchun/article/details/78552908
 // reference: TensorRT-2.1.2/samples/sampleMNIST/sampleMNIST.cpp
 // demonstrates a typical build and execution phase using a Caffe model that is trained on the MNIST dataset
 

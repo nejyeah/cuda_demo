@@ -11,6 +11,8 @@
 
 #include "common.hpp"
 
+// Blog: http://blog.csdn.net/fengbingchun/article/details/78560694
+
 // reference: TensorRT-2.1.2/samples/sampleMNISTAPI/sampleMNISTAPI.cpp
 // demonstrates how to use the API in order to produce the same network as SampleMNIST but without using NvCaffeParser
 

@@ -11,6 +11,8 @@
 
 #include "common.hpp"
 
+// Blog: http://blog.csdn.net/fengbingchun/article/details/78592366
+
 // 序列化TensorRT模型，然后load TensorRT模型进行推理
 
 namespace {
