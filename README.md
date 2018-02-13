@@ -1,5 +1,6 @@
 # CUDA_Test
-**The main role of the project: CUDA 8.0/TensorRT's usage(each test code gives the implementation of C ++ and CUDA, respectively, and gives the calculation time for each method):**
+**The main role of the project: CUDA 8.0/TensorRT's usage(each test code gives the implementation of C ++ and CUDA, respectively, and gives the calculation time for each method)**  
+**Note: Clone this repository to E:/GitCode/**
 - CUDA 8.0 test code
 	- simple
 		- vector add: C = A + B
@@ -19,6 +20,8 @@
 	- image process
 		- bgr to gray
 		- bgr to bgr565
+		- gray image histogram equalization(only C++ implementation)
+		- gray image edge detection: Laplacian(only C++ implementation)
 - TensorRT 2.1.2 test code
 	- MNIST
 	- MNIST API(use api produce network)

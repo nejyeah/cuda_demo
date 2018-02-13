@@ -7,6 +7,38 @@
 #include <algorithm>
 #include "common.hpp"
 
+int test_image_process_laplacian()
+{
+	// Blog: http://blog.csdn.net/fengbingchun/article/details/79321200
+	cv::Mat src = cv::imread("E:/GitCode/CUDA_Test/test_data/images/lena.png", 0);
+	if (!src.data || src.channels() != 1) {
+		fprintf(stderr, "read image fail\n");
+		return -1;
+	}
+	int width{ 400 }, height{ 400 };
+	cv::resize(src, src, cv::Size(width, height));
+
+	std::unique_ptr<unsigned char[]> data1(new unsigned char[width * height]), data2(new unsigned char[width * height]);
+	float elapsed_time1{ 0.f }, elapsed_time2{ 0.f }; // milliseconds
+	int ksize{ 1 };
+
+	CHECK(laplacian_cpu(src.data, width, height, ksize, data1.get(), &elapsed_time1) == 0);
+	//CHECK(laplacian_gpu(src.data, width, height, data2.get(), &elapsed_time2) == 0);
+
+	//fprintf(stdout, "gray image edge detection: laplacian: cpu run time: %f ms, gpu run time: %f ms\n", elapsed_time1, elapsed_time2);
+
+	cv::Mat dst;
+	cv::Laplacian(src, dst, src.depth(), ksize);
+	cv::imwrite("E:/GitCode/CUDA_Test/test_data/images/laplacian.png", dst);
+
+	CHECK(compare_result(data1.get(), dst.data, width*height) == 0);
+	//CHECK(compare_result(data1.get(), data2.get(), width*height) == 0);
+
+	save_image(src, dst, width, height / 2, "E:/GitCode/CUDA_Test/test_data/images/laplacian_result.png");
+
+	return 0;
+}
+
 int test_image_process_histogram_equalization()
 {
 	// Blog: http://blog.csdn.net/fengbingchun/article/details/79188021

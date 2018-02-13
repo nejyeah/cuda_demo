@@ -4,15 +4,20 @@
 #include <cstdlib>
 #include <vector>
 
-int test_image_process_histogram_equalization();
+int test_image_process_laplacian(); // »Ò¶ÈÍ¼Ïñ±ßÔµ¼ì²â£ºÀ­ÆÕÀ­Ë¹±ä»»
+// ksize: 1: kernel={ 0, 1, 0, 1, -4, 1, 0, 1, 0 }; 3: kernel={ 2, 0, 2, 0, -8, 0, 2, 0, 2 }
+int laplacian_cpu(const unsigned char* src, int width, int height, int ksize, unsigned char* dst, float* elapsed_time);
+int laplacian_gpu(const unsigned char* src, int width, int height, int ksize, unsigned char* dst, float* elapsed_time);
+
+int test_image_process_histogram_equalization(); // »Ò¶ÈÍ¼Ïñ¾ùºâ»¯
 int histogram_equalization_cpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);
 int histogram_equalization_gpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);
 
-int test_image_process_bgr2bgr565();
+int test_image_process_bgr2bgr565(); // Í¼ÏñÑÕÉ«¿Õ¼ä×ª»»£ºBGR --> BGR565
 int bgr2bgr565_cpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);
 int bgr2bgr565_gpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);
 
-int test_image_process_bgr2gray();
+int test_image_process_bgr2gray(); // Í¼ÏñÑÕÉ«¿Õ¼ä×ª»»£ºBGR --> Gray
 int bgr2gray_cpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);
 int bgr2gray_gpu(const unsigned char* src, int width, int height, unsigned char* dst, float* elapsed_time);
 

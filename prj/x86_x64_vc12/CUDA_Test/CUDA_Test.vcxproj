@@ -34,6 +34,7 @@
     <ClCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\histogram_equalization.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\julia.cpp" />
+    <ClCompile Include="..\..\..\demo\CUDA_Test\laplacian.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\layer_channel_normalize.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\layer_prior_vbox.cpp" />
     <ClCompile Include="..\..\..\demo\CUDA_Test\layer_reverse.cpp" />
@@ -54,6 +55,7 @@
     <CudaCompile Include="..\..\..\demo\CUDA_Test\heat_conduction.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\histogram_equalization.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\julia.cu" />
+    <CudaCompile Include="..\..\..\demo\CUDA_Test\laplacian.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\layer_channel_normalize.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\layer_prior_vbox.cu" />
     <CudaCompile Include="..\..\..\demo\CUDA_Test\layer_reverse.cu" />
