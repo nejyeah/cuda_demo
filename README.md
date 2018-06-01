@@ -36,7 +36,3 @@
 	- CUDA supports cmake build(file position: prj/linux_cuda_cmake)
 	- TensorRT support cmake build(file position: prj/linux_tensorrt_cmake)
 
-**Screenshot:**  
-![](https://github.com/fengbingchun/CUDA_Test/blob/master/prj/x86_x64_vc12/Screenshot.png)
-
-**Blog:** [fengbingchun](http://blog.csdn.net/fengbingchun/article/category/1531463)
